@@ -1,0 +1,31 @@
+
+{
+    "branch": "main",
+    "python": "",
+    "default_python": "",
+    "project": {
+        "name": "",
+        "package": "",
+        "title": "",
+        "description": "",
+        "version": "",
+        "authors": [
+            {"name": "", "email": ""}
+        ],
+        "maintainers": [
+            {"name": "", "email": ""}
+        ],
+        "codecov": {
+            "token": ""
+        }
+    },
+    "github": {
+        "org": "",
+        "user": "",
+        "repo": ""
+    },
+    "urls": {
+        "domain": "",
+        "docs": ""
+    }
+}

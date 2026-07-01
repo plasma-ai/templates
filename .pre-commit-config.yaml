@@ -1,0 +1,16 @@
+# https://pre-commit.com
+
+repos:
+  - repo: https://github.com/hukkin/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        exclude: '\{\{'
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-gfm-alerts
+          - mdformat-frontmatter
+        args:
+          - --wrap
+          - "72"
+          - --number
