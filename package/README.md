@@ -4,7 +4,7 @@ Template for Plasma packages.
 
 ## Prerequisites
 
-- Python 3.13+
+- Python 3.11+
 - [Cruft](https://cruft.github.io/cruft/)
 - Git
 
