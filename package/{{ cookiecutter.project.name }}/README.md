@@ -69,8 +69,8 @@ import {{ cookiecutter.project.name }}
 ### Install
 
 Run `install.sh` in the package root. With no environment active it
-creates and uses a local `.venv`; with one active (e.g. pyenv) it syncs
-into that:
+creates and uses a local `.venv`; with one active (e.g. pyenv) it
+installs into that environment (editable), without recreating it:
 
 ```bash
 ./install.sh --all-extras --groups=test,lint,type

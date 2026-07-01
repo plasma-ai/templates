@@ -7,7 +7,7 @@ build:
     post_create_environment:
       - pip install uv
     install:
-      - uv sync --active --all-extras --group docs
+      - ./install.sh --all-extras --groups=docs
     pre_build:
       - sphinx-apidoc -f -o docs {{ cookiecutter.project.name }}
 sphinx:
