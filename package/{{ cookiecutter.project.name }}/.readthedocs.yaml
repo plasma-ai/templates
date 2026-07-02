@@ -7,7 +7,7 @@ build:
     post_create_environment:
       - pip install uv
     install:
-      - ./install.sh --all-extras --groups=docs
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --all-extras --group docs
     pre_build:
       - sphinx-apidoc -f -o docs {{ cookiecutter.project.name }}
 sphinx:
