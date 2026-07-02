@@ -26,13 +26,15 @@
 
 ## Installation
 
-Install the `{{ cookiecutter.project.name }}` CLI from PyPI:
+Install the `{{ cookiecutter.project.name }}` package from PyPI:
 
 ```bash
-pipx install {{ cookiecutter.project.package }}
+pip install {{ cookiecutter.project.package }}
 ```
 
-(`pip install {{ cookiecutter.project.package }}` or `uv tool install {{ cookiecutter.project.package }}` work too.)
+Use `pipx install {{ cookiecutter.project.package }}` or
+`uv tool install {{ cookiecutter.project.package }}` to install
+in an isolated environment.
 
 ### Skill
 
@@ -76,16 +78,15 @@ installs into that environment (editable), without recreating it:
 ./install.sh --all-extras --groups=test,lint,type
 ```
 
-Run tools with `uv run <command>`, or activate the environment first
-(`source .venv/bin/activate`). Run `./install.sh --help` for all
-options.
-
-Alternatively, run
+Run `./install.sh --help` for all options. Alternatively, run
 `uv sync --all-extras --group test --group lint --group type` and
 `uv run pre-commit install` to set up the environment manually.
 
 Installing a dependency as editable (e.g. a sibling package) is left to
 the caller: `uv pip install --editable <path>`.
+
+Once installed, run tools with `uv run <command>`, or activate the
+environment first (`source .venv/bin/activate`).
 
 ### Tests
 
