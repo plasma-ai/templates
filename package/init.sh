@@ -117,6 +117,13 @@ fi
 # Create project from template via cruft
 cruft create "https://github.com/$ORG/templates.git" --no-input --directory="package" -E "$CONTEXT"
 
+# cookiecutter names the output dir from project.name; rename when the
+# repository name differs (e.g. an import package with underscores)
+SCAFFOLD=$(python3 -c "import json; print(json.load(open('$CONTEXT'))['project']['name'])")
+if [[ "$SCAFFOLD" != "$NAME" && -d "$SCAFFOLD" && ! -e "$NAME" ]]; then
+    mv "$SCAFFOLD" "$NAME"
+fi
+
 # Post-scaffolding setup
 cd "$NAME"
 ln -s AGENTS.md CLAUDE.md
