@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import functools
+import os
+import sys
 from collections.abc import Callable
 from typing import Any
 
@@ -30,6 +32,13 @@ def command(
                 return f(*args, **kwargs)
             except (typer.Exit, typer.Abort, typer.BadParameter):
                 raise
+            except BrokenPipeError:
+                # a downstream reader closed the pipe (not an error):
+                # point stdout at devnull so the interpreter's exit
+                # flush stays quiet, and end the pipeline successfully
+                devnull = os.open(os.devnull, os.O_WRONLY)
+                os.dup2(devnull, sys.stdout.fileno())
+                raise SystemExit(0) from None
             except Exception as e:
                 error = type(e).__name__ if private else 'Error'
                 typer.echo(f'{error}: {e}', err=True)
