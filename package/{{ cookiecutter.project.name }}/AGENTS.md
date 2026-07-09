@@ -266,7 +266,32 @@ that make the test's intent clear.
 
 ## Code Style
 
-Key patterns (see `pyproject.toml` for formatter/linter config):
+No implementation-phase comments and no development-history references
+of any kind, in any surface — code, comments, docstrings, test names,
+user-visible strings, docs. That means no bug-ledger or review-item ids,
+no internal run/phase/unit names, and no old-implementation narration
+("the old default", "previously", "no longer", "renamed from", "used
+to"). State every rationale in present-tense design terms: the code
+should read as if it was always this way.
+
+Comments are small until proven big. Lines are earned by non-obvious
+invariants, cross-file contracts, ordering/safety requirements, or
+why-rationale that prevents a plausible wrong "fix" — never by narrating
+what the code visibly does, restating signatures, or baking in
+considered-and-rejected alternatives. One load-bearing sentence beats
+four explanatory ones.
+
+Step-by-step `# verb noun` comments before logical blocks — but aim for
+the middle ground: short methods need no comments; longer methods label
+logical blocks, not every line, and never leave long stretches of dense
+logic uncommented.
+
+No absolute paths in persisted data — everything should be relative or
+derivable from the git repo root.
+
+### Key Patterns
+
+See `pyproject.toml` for formatter/linter config.
 
 - `from __future__ import annotations` in every module
 - `__all__` in every leaf module; wildcard re-exports in `__init__.py`
