@@ -12,17 +12,20 @@
 
 {{ cookiecutter.project.description }}
 
----
+______________________________________________________________________
 
-**Source**: [https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}](https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }})
+**Source**:
+[https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}](https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }})
 
-**Package**: [https://pypi.org/project/{{ cookiecutter.project.package }}/](https://pypi.org/project/{{ cookiecutter.project.package }}/)
+**Package**:
+[https://pypi.org/project/{{ cookiecutter.project.package }}/](https://pypi.org/project/{{ cookiecutter.project.package }}/)
 {%- if cookiecutter.urls.docs %}
 
-**Documentation**: [https://{{ cookiecutter.urls.docs }}](https://{{ cookiecutter.urls.docs }})
+**Documentation**:
+[https://{{ cookiecutter.urls.docs }}](https://{{ cookiecutter.urls.docs }})
 {%- endif %}
 
----
+______________________________________________________________________
 
 ## Installation
 

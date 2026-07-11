@@ -3,9 +3,8 @@
 {{ cookiecutter.project.description }}
 """
 
-from . import cli, core, util
+from . import cli, core, exceptions, typing, util
 from .cli import *
 from .core import *
-from .util import *
 
 __version__ = '{{ cookiecutter.project.version }}'
