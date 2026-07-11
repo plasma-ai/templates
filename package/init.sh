@@ -4,7 +4,7 @@ set -euo pipefail
 # Initialize a repository from the Plasma package template
 # --------------------------------------------------------
 
-# Parse arguments
+# parse arguments
 NAME=""
 CONTEXT=""
 ORG=""
@@ -26,11 +26,11 @@ Options:
     --local             Skip pushing to the remote
     --help|-h           Show this help message
 USAGE
-    exit 0
+    exit "${1:-0}"
 }
 
 while [[ $# -gt 0 ]]; do
-    case $1 in
+    case "$1" in
         --help | -h) usage ;;
         --context | --context=*)
             if [[ "$1" == *=* ]]; then
@@ -40,8 +40,8 @@ while [[ $# -gt 0 ]]; do
                 CONTEXT="$2"
                 shift 2
             else
-                echo "--context requires a value" >&2
-                exit 1
+                echo "Error: --context requires a value" >&2
+                usage 1
             fi
             ;;
         --org | --org=*)
@@ -52,8 +52,8 @@ while [[ $# -gt 0 ]]; do
                 ORG="$2"
                 shift 2
             else
-                echo "--org requires a value" >&2
-                exit 1
+                echo "Error: --org requires a value" >&2
+                usage 1
             fi
             ;;
         --user | --user=*)
@@ -64,8 +64,8 @@ while [[ $# -gt 0 ]]; do
                 GIT_USER="$2"
                 shift 2
             else
-                echo "--user requires a value" >&2
-                exit 1
+                echo "Error: --user requires a value" >&2
+                usage 1
             fi
             ;;
         --email | --email=*)
@@ -76,8 +76,8 @@ while [[ $# -gt 0 ]]; do
                 GIT_EMAIL="$2"
                 shift 2
             else
-                echo "--email requires a value" >&2
-                exit 1
+                echo "Error: --email requires a value" >&2
+                usage 1
             fi
             ;;
         --local)
@@ -85,8 +85,8 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -*)
-            echo "unknown option: $1" >&2
-            exit 1
+            echo "Error: unknown option: $1" >&2
+            usage 1
             ;;
         *)
             NAME="$1"
@@ -95,26 +95,26 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Validate required arguments
+# validate required arguments
 if [[ -z "$NAME" ]]; then
-    printf '%s\n' "ERROR: repository name required" >&2
+    echo "Error: repository name is required" >&2
     exit 1
 fi
 if [[ -z "$CONTEXT" ]]; then
-    printf '%s\n' "ERROR: --context required (path to JSON context file)" >&2
+    echo "Error: --context is required (path to JSON context file)" >&2
     exit 1
 fi
 if [[ -z "$ORG" ]]; then
-    printf '%s\n' "ERROR: --org required" >&2
+    echo "Error: --org is required" >&2
     exit 1
 fi
 
-# Resolve context file to absolute path
+# resolve context file to absolute path
 if [[ ! "$CONTEXT" = /* ]]; then
     CONTEXT="$(pwd)/$CONTEXT"
 fi
 
-# Create project from template via cruft
+# create project from template via cruft
 cruft create "https://github.com/$ORG/templates.git" --no-input --directory="package" -E "$CONTEXT"
 
 # cookiecutter names the output dir from project.name; rename when the
@@ -124,18 +124,18 @@ if [[ "$SCAFFOLD" != "$NAME" && -d "$SCAFFOLD" && ! -e "$NAME" ]]; then
     mv "$SCAFFOLD" "$NAME"
 fi
 
-# Post-scaffolding setup
+# post-scaffolding setup
 cd "$NAME"
 ln -s AGENTS.md CLAUDE.md
 
-# Initialize git with main branch
+# initialize git with main branch
 git init
 [[ -n "$GIT_USER" ]] && git config user.name "$GIT_USER"
 [[ -n "$GIT_EMAIL" ]] && git config user.email "$GIT_EMAIL"
 git add . && git commit -m "init main"
 git branch -M main
 
-# Push to remote unless --local
+# push to remote unless --local
 if [[ "$LOCAL" != true ]]; then
     git remote add origin "https://github.com/$ORG/$NAME.git"
     git push --set-upstream origin main
