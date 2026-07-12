@@ -71,9 +71,8 @@ When writing or modifying code:
    existing comment patterns in new code.
 6. **When in doubt, emulate.** Find the nearest analogous code in the
    codebase and mirror its structure.
-7. **Preserve trailing newline patterns.** If a file ends with a
-   trailing newline, keep it. If a file ends without one, don't add one.
-   Match whatever the file already does.
+7. **End files with a trailing newline.** Every committed file ends
+   with one — the `end-of-file-fixer` hook enforces it.
 
 ### Adapting to the Codebase
 
@@ -247,6 +246,13 @@ instead of duplicating test functions with different constants. Avoid
 random magic numbers — use descriptive variable names or setup helpers
 that make the test's intent clear.
 
+**Red before green across boundaries.** A failing test that must land
+before its fix — crossing a commit or merge boundary — carries
+`pytest.mark.xfail(strict=True)` naming the reason; the fix commit
+removes the marker, and strict mode makes a lingering marker fail the
+suite. A red-then-fix chain inside a single change stays bare-red and
+never commits red.
+
 ### Good Tests
 
 - **Tests a real workflow:** constructs objects, exercises them, checks
@@ -295,13 +301,4 @@ logic uncommented.
 No absolute paths in persisted data — everything should be relative or
 derivable from the git repo root.
 
-### Key Patterns
-
 See `pyproject.toml` for formatter/linter config.
-
-- `from __future__ import annotations` in every module
-- `__all__` in every leaf module; wildcard re-exports in `__init__.py`
-- `self: ClassName` on methods, `cls: type[ClassName]` on classmethods
-- Google-style docstrings with double-backtick RST references
-- Section headers: `# ------ section name` (module level only)
-- Single quotes preferred; double quotes for docstrings
