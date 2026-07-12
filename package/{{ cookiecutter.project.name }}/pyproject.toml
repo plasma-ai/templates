@@ -200,6 +200,10 @@ ignore = [
     "ANN202",
     "ANN204",
     "F401",
+    "I002",
+]
+"docs/conf.py" = [
+    "I002",
 ]
 "tests/**" = [
     "F811",
@@ -208,6 +212,7 @@ ignore = [
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
