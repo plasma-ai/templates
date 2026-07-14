@@ -10,7 +10,7 @@ Template for Plasma packages.
 
 ## What You Get
 
-```
+```text
 <package>/
 ├── .claude-plugin/        Claude Code plugin manifest
 ├── .codex-plugin/         Codex plugin manifest
@@ -19,6 +19,7 @@ Template for Plasma packages.
 ├── examples/              Example projects
 ├── <package>/             Python package
 │   ├── __init__.py
+│   ├── constants.py       Constants
 │   ├── exceptions.py      Exception classes
 │   ├── typing.py          Type hints
 │   ├── cli/               CLI layer
@@ -62,6 +63,9 @@ repo. Commit any template changes before scaffolding.
 
    ```json
    {
+       "branch": "main",
+       "python": ">=3.11,<3.15",
+       "default_python": "3.14",
        "project": {
            "name": "project-name",
            "package": "package-name",
@@ -86,6 +90,10 @@ repo. Commit any template changes before scaffolding.
 
    Fields:
 
+   - `branch` — default git branch (defaults to `main`)
+   - `python` — Python version constraint for `requires-python`
+   - `default_python` — Python version for `.python-version`, CI, and
+     Read the Docs
    - `project.name` — Python package name (directory and import name)
    - `project.package` — PyPI package name (for install commands and
      badges)
@@ -109,7 +117,9 @@ repo. Commit any template changes before scaffolding.
    bash templates/package/init.sh <name> --context=<path> --org=<org>
    ```
 
-   - `name` must match `project.name` in the context file.
+   - `name` is the repository name — the scaffold directory is renamed
+     to it when it differs from `project.name` (e.g. an import package
+     with underscores).
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 
@@ -118,7 +128,7 @@ repo. Commit any template changes before scaffolding.
 Generate API documentation:
 
 ```bash
-sphinx-apidoc -f -o docs <name>
+uv run --no-sync sphinx-apidoc -f -o docs <name>
 ```
 
 Re-run when new modules are added.
@@ -128,6 +138,6 @@ Re-run when new modules are added.
 Check for upstream template changes:
 
 ```bash
-cruft check
-cruft update
+uv run --no-sync cruft check
+uv run --no-sync cruft update
 ```

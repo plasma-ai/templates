@@ -14,3 +14,10 @@ Files under `package/` are cookiecutter output — keep every `{{ ... }}`
 placeholder and `{% raw %}`/`{% endraw %}` guard intact, and remember
 that edits here propagate to every derived repository via
 `cruft update`.
+
+## Build & Development
+
+```bash
+# run pre-commit
+pre-commit run --all-files
+```
