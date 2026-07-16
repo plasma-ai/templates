@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib.metadata
 import importlib.resources
 import pathlib
 import shutil
@@ -10,6 +9,7 @@ from typing import Optional
 
 import typer
 
+import {{ cookiecutter.project.name }}
 from {{ cookiecutter.project.name }}.cli.utils import command
 
 __all__ = [
@@ -22,9 +22,11 @@ def version(app: typer.Typer) -> typer.Typer:
     """Register the ``--version`` flag on the root callback."""
 
     def _version_callback(value: bool) -> None:
-        """Print the installed ``{{ cookiecutter.project.package }}`` version and exit."""
+        """Print the running ``{{ cookiecutter.project.name }}`` package's version and exit."""
         if value:
-            typer.echo(importlib.metadata.version('{{ cookiecutter.project.package }}'))
+            # the package's own __version__, so an editable install reports
+            # the code it runs, not install-time dist-info
+            typer.echo({{ cookiecutter.project.name }}.__version__)
             raise typer.Exit()
 
     # version flag
