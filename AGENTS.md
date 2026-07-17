@@ -17,7 +17,13 @@ that edits here propagate to every derived repository via
 
 ## Build & Development
 
+The repository is cookiecutter sources, so there is no build step. Run
+pre-commit to format and lint every file, the template sources under
+`package/` included:
+
 ```bash
-# run pre-commit
 pre-commit run --all-files
 ```
+
+Install the hooks once with `pre-commit install` so they also run on
+each commit.
