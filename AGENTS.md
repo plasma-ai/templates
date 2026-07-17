@@ -18,8 +18,9 @@ that edits here propagate to every derived repository via
 ## Build & Development
 
 The repository is cookiecutter sources, so there is no build step. Run
-pre-commit to format and lint every file, the template sources under
-`package/` included:
+pre-commit to format and lint the repo's own docs — the `package/`
+templates are excluded (their `{{ ... }}` placeholders are not valid to
+reformat):
 
 ```bash
 pre-commit run --all-files
