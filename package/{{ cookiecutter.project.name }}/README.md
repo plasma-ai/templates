@@ -110,6 +110,8 @@ pre-commit run --all-files
 
 The contribution workflow is covered by the organization-wide
 [CONTRIBUTING.md](https://github.com/{{ github_owner }}/.github/blob/main/CONTRIBUTING.md);
-repository conventions live in [AGENTS.md](AGENTS.md), and the release
-process (version sources, tagging, CI guard) in the organization-wide
+repository conventions live in
+[AGENTS.md](https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/blob/{{ cookiecutter.branch }}/AGENTS.md),
+and the release process (version sources, tagging, CI guard) in the
+organization-wide
 [RELEASING.md](https://github.com/{{ github_owner }}/.github/blob/main/RELEASING.md).
