@@ -205,6 +205,9 @@ ignore = [
 "docs/conf.py" = [
     "I002",
 ]
+"{{ cookiecutter.project.name }}/constants.py" = [
+    "I002",
+]
 "tests/**" = [
     "F811",
     "S101",

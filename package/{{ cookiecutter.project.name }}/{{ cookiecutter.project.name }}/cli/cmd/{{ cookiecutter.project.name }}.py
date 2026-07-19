@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib.metadata
 import importlib.resources
 import pathlib
 import shutil
@@ -10,6 +9,7 @@ from typing import Optional
 
 import typer
 
+import {{ cookiecutter.project.name }}
 from {{ cookiecutter.project.name }}.cli.utils import command
 
 __all__ = [
@@ -22,9 +22,9 @@ def version(app: typer.Typer) -> typer.Typer:
     """Register the ``--version`` flag on the root callback."""
 
     def _version_callback(value: bool) -> None:
-        """Print the installed ``{{ cookiecutter.project.package }}`` version and exit."""
+        """Print the running ``{{ cookiecutter.project.name }}`` package's version and exit."""
         if value:
-            typer.echo(importlib.metadata.version('{{ cookiecutter.project.package }}'))
+            typer.echo({{ cookiecutter.project.name }}.__version__)
             raise typer.Exit()
 
     # version flag
@@ -47,18 +47,28 @@ def version(app: typer.Typer) -> typer.Typer:
 def install(app: typer.Typer) -> typer.Typer:
     """Register the ``install`` command."""
     # project flag
-    project_help = 'Install config in cwd rather than home directory.'
+    project_help = 'Install the skill in cwd rather than home directory.'
     project = typer.Option(False, '--project', help=project_help)
+    # link flag
+    link_help = (
+        'Symlink the bundled skill instead of copying (requires the package'
+        ' files on disk, e.g. an editable install), so source edits apply'
+        ' without re-installing.'
+    )
+    link = typer.Option(False, '--link', help=link_help)
 
     @command(app, 'install')
     def _install(
         project: bool = project,
+        link: bool = link,
     ) -> None:
         """Install the {{ cookiecutter.project.name }} skill for Claude Code and Codex.
 
         Copies the bundled skill into the Claude (.claude/skills) and Codex
         (.agents/skills) skill directories. Targets your home directory by
-        default, or the current project with --project.
+        default, or the current project with --project. --link symlinks the
+        skill instead of copying -- the editable-install dev setup, where
+        source edits apply without re-installing.
         """
         # resolve install directory
         if project:
@@ -73,7 +83,15 @@ def install(app: typer.Typer) -> typer.Typer:
         # collect skills
         skills_dir = importlib.resources.files('{{ cookiecutter.project.name }}').joinpath('skills')
         skills = [path for path in skills_dir.iterdir() if path.is_dir()]
-        # copy each skill into every target (replaces any prior copy)
+        # a symlink needs a real directory to point at; only an on-disk
+        # package (an editable install, not a zipped one) provides it
+        if link and not isinstance(skills_dir, pathlib.Path):
+            raise RuntimeError(
+                '--link requires the bundled skill to be a real directory'
+                ' (an editable install); a zipped install cannot install'
+                ' the skill from the CLI.'
+            )
+        # copy or link each skill into every target (replaces any prior install)
         for skill in sorted(skills, key=lambda path: path.name):
             for target in targets:
                 dest = target / skill.name
@@ -82,7 +100,11 @@ def install(app: typer.Typer) -> typer.Typer:
                     dest.unlink()
                 elif dest.is_dir():
                     shutil.rmtree(dest)
-                shutil.copytree(skill, dest)
-                typer.echo(f'Installed {skill.name} -> {dest}')
+                if link:
+                    dest.symlink_to(skill)
+                    typer.echo(f'Linked {skill.name} -> {dest}.')
+                else:
+                    shutil.copytree(skill, dest)
+                    typer.echo(f'Installed {skill.name} -> {dest}.')
 
     return app

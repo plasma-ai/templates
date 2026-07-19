@@ -10,9 +10,7 @@ from typing import Any
 
 import typer
 
-__all__ = [
-    'command',
-]
+__all__ = ['command']
 
 
 def command(

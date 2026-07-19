@@ -71,8 +71,8 @@ When writing or modifying code:
    existing comment patterns in new code.
 6. **When in doubt, emulate.** Find the nearest analogous code in the
    codebase and mirror its structure.
-7. **End files with a trailing newline.** Every committed file ends
-   with one — the `end-of-file-fixer` hook enforces it.
+7. **End files with a trailing newline.** Every committed file ends with
+   one — the `end-of-file-fixer` hook enforces it.
 
 ### Adapting to the Codebase
 
@@ -100,9 +100,8 @@ just accelerate your ramp-up.
   aren't yet documented, add them to the appropriate `AGENTS.md`:
   repo-specific conventions belong in the repo's own file; org-wide
   conventions belong in the shared sections, which are maintained at the
-  organization level and synced verbatim across repositories — make
-  shared-section changes at the source (or flag them for promotion),
-  never in a synced copy.
+  organization level — make shared-section changes at the org root (or
+  flag them for promotion) and propagate them to repo copies.
 
 **Propose better conventions.** If you see a pattern that could be
 improved across the codebase — a more readable structure, a safer error
@@ -247,11 +246,11 @@ random magic numbers — use descriptive variable names or setup helpers
 that make the test's intent clear.
 
 **Red before green across boundaries.** A failing test that must land
-before its fix — crossing a commit or merge boundary — carries
-`pytest.mark.xfail(strict=True)` naming the reason; the fix commit
-removes the marker, and strict mode makes a lingering marker fail the
-suite. A red-then-fix chain inside a single change stays bare-red and
-never commits red.
+before its fix — crossing a commit or merge boundary — carries the test
+framework's strict expected-failure marker naming the reason; the fix
+commit removes the marker, and strict mode makes a lingering marker fail
+the suite. A red-then-fix chain inside a single change stays bare-red
+and never commits red.
 
 ### Good Tests
 
