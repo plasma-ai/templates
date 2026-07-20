@@ -4,9 +4,9 @@
 
 Templates for Plasma repositories.
 
-Uses [Cruft](https://cruft.github.io/cruft/) for downstream
-synchronization — when the template changes, projects created from it
-can pull updates via `cruft check` and `cruft update`.
+Uses [Cruft](https://cruft.github.io/cruft/) for downstream synchronization —
+when the template changes, projects created from it can pull updates via
+`cruft check` and `cruft update`.
 
 ## Templates
 
@@ -14,8 +14,7 @@ can pull updates via `cruft check` and `cruft update`.
 | :------------------ | :--------------------------------------------------------------------------------------------- |
 | [package](package/) | Standalone package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions |
 
-See the README in each template subdirectory for initialization
-instructions.
+See the README in each template subdirectory for initialization instructions.
 
 ## License
 

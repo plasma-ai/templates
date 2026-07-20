@@ -49,5 +49,5 @@ repos:
           - mdformat-frontmatter
         args:
           - --wrap
-          - "72"
+          - "80"
           - --number

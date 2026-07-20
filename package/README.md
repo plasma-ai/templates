@@ -49,15 +49,14 @@ Template for Plasma packages.
 ## Codecov
 
 1. Go to `codecov.io/gh/<org>` and add the repository.
-2. Copy the *graphing token* — you will need it for the
-   `project.codecov.token` field in the context file below.
-3. Copy the *secret token* into GitHub Actions secrets as
-   `CODECOV_TOKEN`.
+2. Copy the *graphing token* — you will need it for the `project.codecov.token`
+   field in the context file below.
+3. Copy the *secret token* into GitHub Actions secrets as `CODECOV_TOKEN`.
 
 ## Initialization
 
-**Important:** Cruft clones the templates repo from GitHub. Commit and
-push any template changes before scaffolding.
+**Important:** Cruft clones the templates repo from GitHub. Commit and push any
+template changes before scaffolding.
 
 1. Create a JSON context file with your project details:
 
@@ -91,20 +90,16 @@ push any template changes before scaffolding.
    Fields:
 
    - `branch` — default git branch (defaults to `main`)
-   - `python` — Python version constraint for `requires-python`
-     (required)
-   - `default_python` — Python version for `.python-version`, CI, and
-     Read the Docs (required)
+   - `python` — Python version constraint for `requires-python` (required)
+   - `default_python` — Python version for `.python-version`, CI, and Read the
+     Docs (required)
    - `project.name` — Python package name (directory and import name)
-   - `project.package` — PyPI package name (for install commands and
-     badges)
+   - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
    - `project.description` — one-line description
    - `project.version` — initial version string
-   - `project.authors` / `project.maintainers` — list of `{name, email}`
-     objects
-   - `project.codecov.token` — Codecov graphing token for badge
-     rendering
+   - `project.authors` / `project.maintainers` — list of `{name, email}` objects
+   - `project.codecov.token` — Codecov graphing token for badge rendering
    - `github.org` — GitHub organization (used for repository URLs)
    - `github.user` — GitHub username (fallback when `org` is empty)
    - `github.repo` — repository name
@@ -118,16 +113,16 @@ push any template changes before scaffolding.
    bash templates/package/init.sh <name> --context=<path> --org=<org>
    ```
 
-   - `name` is the repository name — the scaffold directory is renamed
-     to it when it differs from `project.name` (e.g. an import package
-     with underscores).
+   - `name` is the repository name — the scaffold directory is renamed to it
+     when it differs from `project.name` (e.g. an import package with
+     underscores).
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 
 ## Sphinx
 
-Generate API documentation (`<package>` is `project.name`, the import
-package directory):
+Generate API documentation (`<package>` is `project.name`, the import package
+directory):
 
 ```bash
 uv sync --inexact --group docs
