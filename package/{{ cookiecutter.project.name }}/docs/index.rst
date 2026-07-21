@@ -7,12 +7,12 @@ Welcome to the ``{{ cookiecutter.project.name }}`` documentation!
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents:
+   :titlesonly:
 
-   modules
+   api
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
