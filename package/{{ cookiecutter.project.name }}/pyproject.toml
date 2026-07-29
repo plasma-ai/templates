@@ -24,6 +24,7 @@ Issues = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/i
 {%- if cookiecutter.urls.docs %}
 Documentation = "https://{{ cookiecutter.urls.docs }}"
 {%- endif %}
+Changelog = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/blob/{{ cookiecutter.branch }}/CHANGELOG.md"
 
 [project.scripts]
 {{ cookiecutter.project.name }} = "{{ cookiecutter.project.name }}.cli.main:cli"
@@ -31,6 +32,7 @@ Documentation = "https://{{ cookiecutter.urls.docs }}"
 [tool.poetry]
 packages = [{include = "{{ cookiecutter.project.name }}"}]
 include = [
+    { path = "CHANGELOG.md", format = ["sdist"] },
     { path = "{{ cookiecutter.project.name }}/skills/**/*", format = ["sdist", "wheel"] },
 ]
 
