@@ -53,6 +53,7 @@ security = [
 test = [
     "pytest-cov",
     "pytest-xdist",
+    "packaging",
 ]
 type = [
     "pyright",
