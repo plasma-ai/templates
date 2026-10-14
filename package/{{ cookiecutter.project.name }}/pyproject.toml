@@ -232,7 +232,7 @@ addopts = "--doctest-modules -n auto"
 
 [tool.coverage.run]
 # https://coverage.readthedocs.io/en/latest/config.html#run
-source = ["{{ cookiecutter.project.name }}"]
+source_pkgs = ["{{ cookiecutter.project.name }}"]
 parallel = true
 
 [tool.coverage.report]
