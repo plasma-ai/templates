@@ -14,6 +14,7 @@ __all__ = ['cli']
 def cli(**kwargs: Any) -> None:
     """Run the ``{{ cookiecutter.project.name }}`` CLI."""
     # construct app
+    kwargs.setdefault('rich_markup_mode', None)
     kwargs.setdefault('pretty_exceptions_enable', False)
     app = typer.Typer(name='{{ cookiecutter.project.name }}', **kwargs)
     # version callback
