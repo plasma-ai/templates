@@ -28,3 +28,7 @@ pre-commit run --all-files
 
 Install the hooks once with `pre-commit install` so they also run on each
 commit.
+
+Derived repositories run mdformat on the Markdown this repository skips, so wrap
+templated prose at 80 columns, and keep placeholders out of wrapped prose, where
+their length would move the line breaks.

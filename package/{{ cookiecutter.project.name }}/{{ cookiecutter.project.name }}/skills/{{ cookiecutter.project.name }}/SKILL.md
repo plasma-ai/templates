@@ -24,5 +24,9 @@ Then run commands directly:
 {{ cookiecutter.project.name }} <command> ...
 ```
 
-Run `{{ cookiecutter.project.name }} --help` for a list of commands, and
-`{{ cookiecutter.project.name }} <command> --help` for full option descriptions.
+For a list of commands, or a command's full option descriptions, run:
+
+```bash
+{{ cookiecutter.project.name }} --help
+{{ cookiecutter.project.name }} <command> --help
+```
