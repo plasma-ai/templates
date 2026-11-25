@@ -8,7 +8,7 @@ use std::io::Write as _;
 use std::panic;
 use std::process::ExitCode;
 
-use clap::Parser as _;
+use clap::ColorChoice;
 
 use crate::cli::Cli;
 use crate::command::CommandError;
@@ -34,17 +34,21 @@ const ISSUES_URL: &str = "https://github.com/{{ cookiecutter.github.org or cooki
 /// signal. A panic exits 101.
 pub fn main() -> ExitCode {
     install_panic_hook();
-    let cli = Cli::parse();
+    let cli = Cli::parse_or_version();
     let config = Config::from_env();
     let interrupt = Interrupt::new();
-    let mut output = Output::new(cli.global.color, cli.global.quiet);
-    let result = cli
-        .command
-        .run(&mut output, &config, &interrupt)
-        .and_then(|outcome| {
-            output.flush()?;
-            Ok(outcome)
-        });
+    let (color, quiet) = cli.as_ref().map_or((ColorChoice::Auto, false), |cli| {
+        (cli.global.color, cli.global.quiet)
+    });
+    let mut output = Output::new(color, quiet);
+    let result = match &cli {
+        Some(cli) => cli.command.run(&mut output, &config, &interrupt),
+        None => print_version(&mut output),
+    }
+    .and_then(|outcome| {
+        output.flush()?;
+        Ok(outcome)
+    });
     if let Some(signal) = interrupt.signal() {
         return interrupt::terminate(signal);
     }
@@ -57,6 +61,12 @@ pub fn main() -> ExitCode {
             ExitCode::from(2)
         }
     }
+}
+
+/// Prints the bare version, the form `--version` has on every org tool.
+fn print_version(output: &mut Output) -> Result<CommandOutcome, CommandError> {
+    output.data(env!("CARGO_PKG_VERSION"))?;
+    Ok(CommandOutcome::Success)
 }
 
 /// Adds a line to the default panic message that says where to report it.

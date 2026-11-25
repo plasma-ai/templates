@@ -19,4 +19,4 @@ def test_main_runs_installed_binary() -> None:
         check=True,
     )
     version = {{ cookiecutter.project.name }}.__version__
-    assert result.stdout == f'{{ cookiecutter.project.name }} {version}\n'
+    assert result.stdout == f'{version}\n'

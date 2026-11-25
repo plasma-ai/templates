@@ -81,14 +81,12 @@ fn help_describes_every_command_and_option() -> TestResult {
     Ok(())
 }
 
-/// Checks that `--version` prints the tool's name and the workspace version.
+/// Checks that `--version` prints the bare workspace version, with no name
+/// before it, so a script can parse the output as a version.
 #[test]
-fn version_names_the_tool_and_the_workspace_version() -> TestResult {
+fn version_prints_the_bare_workspace_version() -> TestResult {
     let sandbox = Sandbox::new()?;
     let output = sandbox.run(&["--version"])?;
-    assert_eq!(
-        output.to_string(),
-        format!("{{ cookiecutter.project.name }} {}\n", env!("CARGO_PKG_VERSION"))
-    );
+    assert_eq!(output.to_string(), concat!(env!("CARGO_PKG_VERSION"), "\n"));
     Ok(())
 }
