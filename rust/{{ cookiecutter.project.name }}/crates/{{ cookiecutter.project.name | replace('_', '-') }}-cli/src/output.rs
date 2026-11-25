@@ -57,8 +57,8 @@ impl Output {
     }
 
     /// Writes one line of the command's product to stdout.
-    pub(crate) fn data(&mut self, line: &str) -> Result<(), StdoutError> {
-        writeln!(self.stdout, "{line}").map_err(StdoutError)?;
+    pub(crate) fn data(&mut self, line: &str) -> Result<(), WriteStdoutError> {
+        writeln!(self.stdout, "{line}").map_err(WriteStdoutError)?;
         if self.interactive {
             self.flush()?;
         }
@@ -66,7 +66,7 @@ impl Output {
     }
 
     /// Writes a status message to stderr, unless `--quiet` is set.
-    pub(crate) fn status(&mut self, message: &str) -> Result<(), StdoutError> {
+    pub(crate) fn status(&mut self, message: &str) -> Result<(), WriteStdoutError> {
         if self.quiet {
             return Ok(());
         }
@@ -86,8 +86,8 @@ impl Output {
     }
 
     /// Writes what is buffered for stdout.
-    pub(crate) fn flush(&mut self) -> Result<(), StdoutError> {
-        self.stdout.flush().map_err(StdoutError)
+    pub(crate) fn flush(&mut self) -> Result<(), WriteStdoutError> {
+        self.stdout.flush().map_err(WriteStdoutError)
     }
 
     fn write_error(&mut self, error: &CommandError) -> io::Result<()> {
@@ -107,9 +107,9 @@ impl Output {
 /// A failed write to stdout.
 #[derive(Debug, thiserror::Error)]
 #[error("cannot write to stdout")]
-pub(crate) struct StdoutError(#[source] io::Error);
+pub(crate) struct WriteStdoutError(#[source] io::Error);
 
-impl StdoutError {
+impl WriteStdoutError {
     /// Returns whether the reader closed the pipe, which is not a failure.
     pub(crate) fn is_closed_pipe(&self) -> bool {
         self.0.kind() == io::ErrorKind::BrokenPipe

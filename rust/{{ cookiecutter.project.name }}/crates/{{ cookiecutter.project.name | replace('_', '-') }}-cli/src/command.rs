@@ -6,7 +6,7 @@ use {{ cookiecutter.project.name }}_core::skill::LinkSkillsError;
 
 use crate::config::Config;
 use crate::output::Output;
-use crate::output::StdoutError;
+use crate::output::WriteStdoutError;
 
 mod completion;
 mod install;
@@ -46,7 +46,7 @@ pub(crate) enum CommandOutcome {
 pub(crate) enum CommandError {
     /// A write to stdout failed.
     #[error(transparent)]
-    Stdout(#[from] StdoutError),
+    Stdout(#[from] WriteStdoutError),
     /// The bundled skills could not be installed.
     #[error(transparent)]
     InstallSkills(#[from] InstallSkillsError),
