@@ -110,12 +110,13 @@ template changes before scaffolding.
 2. Run `init.sh` from the parent of where the project will be created:
 
    ```bash
-   bash templates/package/init.sh <name> --context=<path> --org=<org>
+   bash templates/init.sh <name> --template=python --context=<path> --org=<org>
    ```
 
    - `name` is the repository name — the scaffold directory is renamed to it
      when it differs from `project.name` (e.g. an import package with
      underscores).
+   - `template` is this template's folder, `python`.
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 

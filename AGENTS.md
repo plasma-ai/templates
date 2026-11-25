@@ -20,7 +20,8 @@ pre-commit to format and lint the repo — paths containing `{{ ... }}`
 placeholders skip the parsing hooks (JSON/YAML checkers, mdformat, and the shell
 hooks; placeholders are not valid to parse or reformat) but keep the safety
 hooks (forbidden files, whitespace, merge conflicts, private keys); everything
-else in `python/` (README.md, init.sh, cookiecutter.json) is fully checked:
+else (`init.sh`, and `README.md` and `cookiecutter.json` in `python/`) is fully
+checked:
 
 ```bash
 pre-commit run --all-files

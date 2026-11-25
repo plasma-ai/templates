@@ -14,7 +14,14 @@ when the template changes, projects created from it can pull updates via
 | :---------------- | :---------------------------------------------------------------------------------------------------- |
 | [python](python/) | Standalone Python package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions |
 
-See the README in each template subdirectory for initialization instructions.
+`init.sh` creates a repository from a template:
+
+```bash
+bash templates/init.sh <name> --template=<template> --context=<path> --org=<org>
+```
+
+See the README in each template subdirectory for the context file and what the
+template renders.
 
 ## License
 
