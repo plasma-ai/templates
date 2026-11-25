@@ -23,6 +23,13 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
+{%- if cookiecutter.rust.bindings == 'bin' %}
+      - name: Install Rust toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
+{%- endif %}
       - name: Install package with test dependencies
         run: ./install.sh --all-extras --groups=test
       - name: Run tests

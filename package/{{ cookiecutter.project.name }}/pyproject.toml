@@ -1,7 +1,11 @@
 {%- set github_owner = cookiecutter.github.org or cookiecutter.github.user -%}
 [project]
 name = "{{ cookiecutter.project.package }}"
+{%- if cookiecutter.rust.bindings == 'bin' %}
+dynamic = ["version"]
+{%- else %}
 version = "{{ cookiecutter.project.version }}"
+{%- endif %}
 description = "{{ cookiecutter.project.description }}"
 readme = "README.md"
 requires-python = "{{ cookiecutter.python }}"
@@ -13,9 +17,13 @@ maintainers = [
 {%- for maintainer in cookiecutter.project.maintainers %}
     { name = "{{ maintainer.name }}", email = "{{ maintainer.email }}" },
 {%- endfor %}{{ '\n' if cookiecutter.project.maintainers }}]
+{%- if cookiecutter.rust.bindings == 'bin' %}
+dependencies = []
+{%- else %}
 dependencies = [
     "typer>=0.24,<1",
 ]
+{%- endif %}
 
 [project.urls]
 Homepage = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}"
@@ -26,6 +34,15 @@ Documentation = "https://{{ cookiecutter.urls.docs }}"
 {%- endif %}
 Changelog = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/blob/{{ cookiecutter.branch }}/CHANGELOG.md"
 
+{%- if cookiecutter.rust.bindings == 'bin' %}
+
+[tool.maturin]
+bindings = "{{ cookiecutter.rust.bindings }}"
+include = [{ path = "CHANGELOG.md", format = "sdist" }]
+manifest-path = "crates/{{ cookiecutter.project.name | replace('_', '-') }}-cli/Cargo.toml"
+module-name = "{{ cookiecutter.project.name }}"
+{%- else %}
+
 [project.scripts]
 {{ cookiecutter.project.name }} = "{{ cookiecutter.project.name }}.cli.main:cli"
 
@@ -35,6 +52,7 @@ include = [
     { path = "CHANGELOG.md", format = ["sdist"] },
     { path = "{{ cookiecutter.project.name }}/skills/**/*", format = ["sdist", "wheel"] },
 ]
+{%- endif %}
 
 [dependency-groups]
 docs = [
@@ -62,6 +80,17 @@ type = [
 [tool.uv]
 required-version = ">=0.8"
 default-groups = []
+{%- if cookiecutter.rust.bindings == 'bin' %}
+# every file the native build reads, so an edit rebuilds the binary
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "Cargo.lock" },
+    { file = "crates/**/Cargo.toml" },
+    { file = "crates/**/*.rs" },
+    { file = "{{ cookiecutter.project.name }}/skills/**/*" },
+]
+{%- endif %}
 
 [tool.ruff]
 # https://docs.astral.sh/ruff
@@ -204,12 +233,22 @@ ignore = [
 "docs/conf.py" = [
     "I002",
 ]
+{%- if cookiecutter.rust.bindings == 'bin' %}
+"{{ cookiecutter.project.name }}/**" = [
+    "S606",
+]
+{%- else %}
 "{{ cookiecutter.project.name }}/constants.py" = [
     "I002",
 ]
+{%- endif %}
 "tests/**" = [
     "F811",
     "S101",
+{%- if cookiecutter.rust.bindings == 'bin' %}
+    "S404",
+    "S603",
+{%- endif %}
 ]
 
 [tool.ruff.lint.isort]
@@ -240,5 +279,10 @@ parallel = true
 show_missing = true
 
 [build-system]
+{%- if cookiecutter.rust.bindings == 'bin' %}
+requires = ["maturin>=1.16,<2"]
+build-backend = "maturin"
+{%- else %}
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
+{%- endif %}

@@ -7,6 +7,13 @@ rust-version.workspace = true
 
 [lints]
 workspace = true
+{%- if cookiecutter.rust.bindings == 'bin' %}
+
+[dependencies]
+include_dir.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+{%- endif %}
 
 [dev-dependencies]
 anyhow.workspace = true

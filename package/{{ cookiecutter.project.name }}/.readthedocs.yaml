@@ -7,7 +7,12 @@ build:
     post_create_environment:
       - pip install uv
     install:
+{%- if cookiecutter.rust.bindings == 'bin' %}
+      # the docs import the package from the sources, so the binary is not built
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --no-install-project --all-extras --group docs
+{%- else %}
       - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --all-extras --group docs
+{%- endif %}
     pre_build:
       - sphinx-apidoc -f -o docs {{ cookiecutter.project.name }}
 sphinx:

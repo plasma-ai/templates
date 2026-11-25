@@ -31,7 +31,9 @@ jobs:
               line for line in init.splitlines() if line.startswith('__version__')
           )
           version = version_line.split('=', 1)[1].strip().strip('\'"')
+{%- if cookiecutter.rust.bindings != 'bin' %}
           project_version = tomllib.load(open('pyproject.toml', 'rb'))['project']['version']
+{%- endif %}
           claude_version = json.load(open('.claude-plugin/plugin.json'))['version']
           codex_version = json.load(open('.codex-plugin/plugin.json'))['version']
           cruft = json.load(open('.cruft.json'))['context']['cookiecutter']
@@ -40,7 +42,9 @@ jobs:
 {%- endif %}
           versions = {
               '__version__': version,
+{%- if cookiecutter.rust.bindings != 'bin' %}
               'pyproject.toml': project_version,
+{%- endif %}
               '.claude-plugin/plugin.json': claude_version,
               '.codex-plugin/plugin.json': codex_version,
               '.cruft.json': cruft['project']['version'],
@@ -54,6 +58,147 @@ jobs:
               raise SystemExit(f'::error::tag v{tag} != {detail}')
           print(f'All versions aligned at v{tag}')
           PY
+{%- if cookiecutter.rust.bindings == 'bin' %}
+      - name: Install Rust toolchain
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: rustup toolchain install
+      - uses: taiki-e/install-action@v2
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          tool: cargo-deny@0.22.1
+      - name: Check Rust advisories
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cargo deny --locked check advisories
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.16.0
+          command: sdist
+          args: --out dist
+      - name: Check distribution metadata
+        run: uvx twine check dist/*
+      - name: Check sdist ships every tracked package file
+        run: |
+          export LC_ALL=C
+          tracked=$(git ls-files {{ cookiecutter.project.name }} | sort)
+          # an empty listing would compare as nothing missing
+          if [[ -z "$tracked" ]]; then
+            echo "::error::no tracked files under {{ cookiecutter.project.name }}/"
+            exit 1
+          fi
+          # the sdist nests every path under its top folder
+          missing=$(comm -23 <(echo "$tracked") <(tar -tzf dist/{{ cookiecutter.project.package | replace('-', '_') }}-*.tar.gz | sed 's|^[^/]*/||' | sort) | sed 's/^/::error::sdist lacks /')
+          if [[ -n "$missing" ]]; then
+            echo "$missing"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-sdist
+          path: dist/
+  wheels:
+    name: wheels ({% raw %}${{ matrix.target }}{% endraw %})
+    needs: [build]
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            manylinux: "2_17"
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            manylinux: "2_17"
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            manylinux: musllinux_1_2
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            manylinux: musllinux_1_2
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+      - name: Install Rust toolchain
+        run: rustup toolchain install
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          maturin-version: v1.16.0
+          target: {% raw %}${{ matrix.target }}{% endraw %}
+          manylinux: {% raw %}${{ matrix.manylinux }}{% endraw %}
+          args: --release --locked --out dist
+      - name: Check distribution metadata
+        run: uvx twine check dist/*
+      - name: Check wheel ships every tracked package file
+        run: |
+          export LC_ALL=C
+          tracked=$(git ls-files {{ cookiecutter.project.name }} | sort)
+          # an empty listing would compare as nothing missing
+          if [[ -z "$tracked" ]]; then
+            echo "::error::no tracked files under {{ cookiecutter.project.name }}/"
+            exit 1
+          fi
+          missing=$(comm -23 <(echo "$tracked") <(unzip -Z1 dist/{{ cookiecutter.project.package | replace('-', '_') }}-*.whl | sort) | sed 's/^/::error::wheel lacks /')
+          if [[ -n "$missing" ]]; then
+            echo "$missing"
+            exit 1
+          fi
+      # NOTE: each wheel is installed by its file path, so the smoke test
+      #   cannot pick up a published release in place of the new build
+      - name: Smoke-test installed wheel
+        if: {% raw %}${{ !contains(matrix.target, 'musl') }}{% endraw %}
+        run: |
+          uv venv smoke
+          uv pip install --python smoke/bin/python dist/*.whl
+          smoke/bin/{{ cookiecutter.project.name }} --version
+          smoke/bin/python -m {{ cookiecutter.project.name }} --version
+          cd "$(mktemp -d)"
+          "$GITHUB_WORKSPACE/smoke/bin/{{ cookiecutter.project.name }}" install --project
+      - name: Smoke-test installed wheel on musl
+        if: {% raw %}${{ contains(matrix.target, 'musl') }}{% endraw %}
+        run: |
+          docker run --rm --volume "$PWD/dist:/dist" python:{{ cookiecutter.default_python }}-alpine sh -ec '
+            pip install /dist/*.whl
+            {{ cookiecutter.project.name }} --version
+            python -m {{ cookiecutter.project.name }} --version
+            cd "$(mktemp -d)"
+            {{ cookiecutter.project.name }} install --project
+          '
+      # importlib mode keeps the worktree off sys.path, so the suite imports
+      # the installed wheel
+      - name: Run tests against installed wheel
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: |
+          uv pip install --python smoke/bin/python --group test
+          smoke/bin/pytest --import-mode=importlib tests
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-{% raw %}${{ matrix.target }}{% endraw %}
+          path: dist/
+  publish:
+    name: publish
+    needs: [build, wheels]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/{{ cookiecutter.project.package }}/
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        pattern: dist-*
+        path: dist/
+        merge-multiple: true
+    - uses: pypa/gh-action-pypi-publish@release/v1
+{%- else %}
       - name: Build wheel
         run: uv build
       - name: Check distribution metadata
@@ -96,3 +241,4 @@ jobs:
         name: dist
         path: dist/
     - uses: pypa/gh-action-pypi-publish@release/v1
+{%- endif %}

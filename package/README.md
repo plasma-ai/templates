@@ -66,6 +66,27 @@ package:
 It also adds the Rust block to `.gitignore`, the cargo hooks to
 `.pre-commit-config.yaml`, and the Rust steps and jobs to the four workflows.
 
+A context that also sets `rust.bindings` to `bin` makes the command a Rust
+binary, which maturin builds into the wheel. The Python CLI and the rest of the
+package skeleton give way to a launcher, and the workspace gains a CLI crate:
+
+```text
+<package>/
+├── crates/
+│   ├── <package>-cli/     Command-line interface, built as the binary
+│   └── <package>-core/    Domain library, with the skill installer
+├── <package>/             Python package
+│   ├── __init__.py
+│   ├── __main__.py        Launcher for `python -m <package>`
+│   └── skills/            Skill definitions, embedded in the binary
+└── tests/                 Test suite for the launcher
+```
+
+The binary starts with `--version`, an `install` command for the skill and a
+`completion` command. `pyproject.toml` switches to the maturin backend with the
+version read from `Cargo.toml`, and the build workflow builds one wheel per
+platform and an sdist.
+
 ## Codecov
 
 1. Go to `codecov.io/gh/<org>` and add the repository.
@@ -85,7 +106,7 @@ template changes before scaffolding.
        "branch": "main",
        "python": ">=3.11,<3.15",
        "default_python": "3.14",
-       "rust": {"toolchain": ""},
+       "rust": {"toolchain": "", "bindings": ""},
        "project": {
            "name": "project-name",
            "package": "package-name",
@@ -116,6 +137,8 @@ template changes before scaffolding.
      Docs (required)
    - `rust.toolchain` — exact stable Rust release for `rust-toolchain.toml` and
      `rust-version`, e.g. `1.100.0` (optional, adds the Cargo workspace)
+   - `rust.bindings` — wheel shape, `bin` for a package whose command is a Rust
+     binary (optional, needs `rust.toolchain`)
    - `project.name` — Python package name (directory and import name)
    - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
@@ -174,3 +197,6 @@ context, then generate and commit the lockfile:
 uv run --no-sync cruft update --variables-to-update '{"rust": {"toolchain": "<X.Y.Z>"}}'
 cargo generate-lockfile
 ```
+
+Set `rust.bindings` when a project is created: on an existing project it removes
+the Python CLI the project has built.

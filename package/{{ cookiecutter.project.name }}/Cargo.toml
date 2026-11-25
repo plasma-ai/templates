@@ -9,7 +9,22 @@ publish = false
 rust-version = "{{ cookiecutter.rust.toolchain }}"
 
 [workspace.dependencies]
+{%- if cookiecutter.rust.bindings == 'bin' %}
+anstream = "1.0.0"
+anstyle = "1.0.14"
+{%- endif %}
 anyhow = "1.0.105"
+{%- if cookiecutter.rust.bindings == 'bin' %}
+clap = "4.6.10"
+clap_complete = "4.6.12"
+include_dir = "0.7.4"
+insta = "1.49.0"
+signal-hook = "0.4.6"
+tempfile = "3.27.0"
+thiserror = "2.0.21"
+
+{{ cookiecutter.project.name | replace('_', '-') }}-core = { path = "crates/{{ cookiecutter.project.name | replace('_', '-') }}-core" }
+{%- endif %}
 
 [workspace.lints.rust]
 elided_lifetimes_in_paths = "warn"
@@ -60,6 +75,15 @@ uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 unreadable_literal = "warn"
 wildcard_imports = "warn"
+
+{%- if cookiecutter.rust.bindings == 'bin' %}
+
+[profile.dev.package.insta]
+opt-level = 3        # snapshot assertions spend their time diffing
+
+[profile.dev.package.similar]
+opt-level = 3        # the diffing library behind insta
+{%- endif %}
 
 [profile.release]
 codegen-units = 1    # whole-crate optimization for the shipped artifact

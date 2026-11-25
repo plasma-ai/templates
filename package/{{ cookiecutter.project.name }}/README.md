@@ -52,6 +52,28 @@ Codex):
 codex plugin marketplace add plasma-ai/plugins
 codex plugin add {{ cookiecutter.project.name }}@plasma
 ```
+{%- if cookiecutter.rust.bindings == 'bin' %}
+
+Another install route is from the CLI, which copies the skill into
+`~/.claude/skills` and `~/.agents/skills` (add `--project` for the current
+project only):
+
+```bash
+{{ cookiecutter.project.name }} install
+```
+
+After upgrading the package, re-run the install command to refresh the copied
+skill.
+
+## Usage
+
+List the commands, or a command's options:
+
+```bash
+{{ cookiecutter.project.name }} --help
+{{ cookiecutter.project.name }} <command> --help
+```
+{%- else %}
 
 Another install route is from the CLI, which copies (or symlinks) the skill into
 `~/.claude/skills` and `~/.agents/skills` (add `--project` for the current
@@ -71,6 +93,7 @@ Basic usage:
 ```python
 import {{ cookiecutter.project.name }}
 ```
+{%- endif %}
 
 ## Development
 
@@ -90,10 +113,17 @@ Run `./install.sh --help` for all options. Alternatively, run
 
 Installing a dependency as editable (e.g. a sibling package) is left to the
 caller: `uv pip install --editable <path>`.
+{%- if cookiecutter.rust.bindings == 'bin' %}
+
+The CLI in the environment is the compiled Rust binary. After a change under
+`crates/`, re-run the install to rebuild it, or run the change directly with
+`cargo run`.
+{%- else %}
 
 With an editable install, the install command's `--link` option symlinks the
 bundled skill into the agent skill directories instead of copying it, so skill
 edits apply without re-running the install.
+{%- endif %}
 
 Once installed, run tools with `uv run --no-sync <command>`, or activate the
 environment first (`source .venv/bin/activate`).

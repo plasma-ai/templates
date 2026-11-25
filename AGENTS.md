@@ -19,6 +19,13 @@ Rust-only path there, and wrap every Rust addition to a shared file in
 `{%- if cookiecutter.rust.toolchain %}`, so a project without Rust renders
 exactly as before.
 
+The Rust CLI is a second option on top of the workspace: the same hook removes
+its files unless `rust.bindings` is `bin`, and removes the Python CLI when it
+is. Guard its additions to a shared file with
+`{%- if cookiecutter.rust.bindings == 'bin' %}`. The hook then runs `cargo fmt`
+on the rendered sources, because rustfmt orders imports and breaks lines by the
+rendered project name, which the template's text cannot follow.
+
 ## Build & Development
 
 The repository is cookiecutter sources, so there is no build step. Run
