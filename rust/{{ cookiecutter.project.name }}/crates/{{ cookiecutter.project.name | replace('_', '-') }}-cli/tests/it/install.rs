@@ -1,7 +1,5 @@
 //! Tests for the `install` command.
 
-use std::fs;
-
 use insta::assert_snapshot;
 
 use crate::support::Sandbox;
@@ -12,11 +10,11 @@ use crate::support::TestResult;
 #[test]
 fn install_writes_the_skill_for_both_agents() -> TestResult {
     let sandbox = Sandbox::new()?;
-    assert_snapshot!(sandbox.run(&["install"])?, @"
+    assert_snapshot!(sandbox.run(&["install"])?, @r#"
     ------- stderr -------
-    Installed {{ cookiecutter.project.name }} -> [ROOT]/home/.claude/skills/{{ cookiecutter.project.name }}.
-    Installed {{ cookiecutter.project.name }} -> [ROOT]/home/.agents/skills/{{ cookiecutter.project.name }}.
-    ");
+    Installed {{ cookiecutter.project.name }} -> "[ROOT]/home/.claude/skills/{{ cookiecutter.project.name }}".
+    Installed {{ cookiecutter.project.name }} -> "[ROOT]/home/.agents/skills/{{ cookiecutter.project.name }}".
+    "#);
     for agent in [".claude", ".agents"] {
         let skill = sandbox.home().join(agent).join("skills/{{ cookiecutter.project.name }}/SKILL.md");
         assert!(skill.is_file(), "{} should exist", skill.display());
@@ -40,11 +38,11 @@ fn quiet_project_install_writes_into_the_working_directory_in_silence() -> TestR
 #[test]
 fn link_points_the_agents_at_the_source_checkout() -> TestResult {
     let sandbox = Sandbox::new()?;
-    assert_snapshot!(sandbox.run(&["install", "--link"])?, @"
+    assert_snapshot!(sandbox.run(&["install", "--link"])?, @r#"
     ------- stderr -------
-    Linked {{ cookiecutter.project.name }} -> [ROOT]/home/.claude/skills/{{ cookiecutter.project.name }}.
-    Linked {{ cookiecutter.project.name }} -> [ROOT]/home/.agents/skills/{{ cookiecutter.project.name }}.
-    ");
+    Linked {{ cookiecutter.project.name }} -> "[ROOT]/home/.claude/skills/{{ cookiecutter.project.name }}".
+    Linked {{ cookiecutter.project.name }} -> "[ROOT]/home/.agents/skills/{{ cookiecutter.project.name }}".
+    "#);
     let skill = sandbox.home().join(".claude/skills/{{ cookiecutter.project.name }}");
     assert!(skill.is_symlink(), "{} should be a link", skill.display());
     assert!(
@@ -59,10 +57,7 @@ fn link_points_the_agents_at_the_source_checkout() -> TestResult {
 #[test]
 fn a_failure_prints_its_cause_chain() -> TestResult {
     let sandbox = Sandbox::new()?;
-    fs::write(
-        sandbox.home().join(".claude"),
-        "a file where a directory belongs",
-    )?;
+    sandbox.write_file("home/.claude", "a file where a directory belongs")?;
     assert_snapshot!(sandbox.run(&["install"])?, @r#"
     ------- stderr -------
     error: cannot prepare the skills directory

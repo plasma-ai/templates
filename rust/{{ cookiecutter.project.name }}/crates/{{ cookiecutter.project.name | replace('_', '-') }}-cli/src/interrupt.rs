@@ -16,10 +16,12 @@ use signal_hook::low_level;
 /// The record of a signal that asked the process to stop.
 #[derive(Debug)]
 pub(crate) struct Interrupt {
-    /// Set once a signal has arrived.
+    /// Set once a signal has arrived, which lets a second one end the process.
     received: Arc<AtomicBool>,
     /// The number of the signal that arrived, or zero.
     signal: Arc<AtomicUsize>,
+    /// Whether the signals are watched already.
+    watching: AtomicBool,
 }
 
 impl Interrupt {
@@ -28,14 +30,19 @@ impl Interrupt {
         Self {
             received: Arc::new(AtomicBool::new(false)),
             signal: Arc::new(AtomicUsize::new(0)),
+            watching: AtomicBool::new(false),
         }
     }
 
     /// Makes SIGINT and SIGTERM set this record instead of ending the process.
     ///
     /// A command that holds something to clean up calls this before it creates
-    /// it. A second signal ends the process at once.
+    /// it. A second signal ends the process at once. A second call does nothing:
+    /// registered twice, the actions would end the process on the first signal.
     pub(crate) fn watch(&self) -> io::Result<()> {
+        if self.watching.swap(true, Ordering::Relaxed) {
+            return Ok(());
+        }
         for signal in [SIGINT, SIGTERM] {
             // NOTE: the conditional action goes first. Registered after the
             // flag, it would end the process on the first signal.
@@ -52,10 +59,10 @@ impl Interrupt {
 
     /// Returns the signal that arrived, if one has.
     pub(crate) fn signal(&self) -> Option<c_int> {
-        if !self.received.load(Ordering::Relaxed) {
-            return None;
+        match self.signal.load(Ordering::Relaxed) {
+            0 => None,
+            signal => c_int::try_from(signal).ok(),
         }
-        c_int::try_from(self.signal.load(Ordering::Relaxed)).ok()
     }
 }
 

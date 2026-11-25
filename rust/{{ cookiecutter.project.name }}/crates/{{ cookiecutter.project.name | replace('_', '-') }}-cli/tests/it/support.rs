@@ -48,6 +48,12 @@ impl Sandbox {
         self.root.join("work")
     }
 
+    /// Writes a fixture file at `path`, relative to the root.
+    pub(crate) fn write_file(&self, path: &str, contents: &str) -> TestResult {
+        fs::write(self.root.join(path), contents)?;
+        Ok(())
+    }
+
     /// Builds the command that runs the binary with `args`.
     ///
     /// The environment holds only `HOME`, `TMPDIR` and a fixed `COLUMNS`, plus

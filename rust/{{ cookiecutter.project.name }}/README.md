@@ -82,11 +82,14 @@ List the commands, or a command's options:
 ### Install
 
 The workspace needs [rustup](https://rustup.rs). Install the toolchain pinned in
-`rust-toolchain.toml`, and the cargo tools at the versions the workflows name:
+`rust-toolchain.toml`:
 
 ```bash
 rustup toolchain install
 ```
+
+The test and supply-chain commands need cargo-nextest, cargo-deny and
+cargo-shear, at the versions the workflows name.
 
 Run `install.sh` in the repository root. With no environment active it creates
 and uses a local `.venv`; with one active (e.g. pyenv) it installs into that

@@ -9,6 +9,9 @@ on:
     branches:
       - {{ cookiecutter.branch }}
 
+env:
+  CARGO_BUILD_WARNINGS: deny
+
 jobs:
   build:
     name: build

@@ -50,6 +50,9 @@ pub fn main() -> ExitCode {
         Ok(outcome)
     });
     if let Some(signal) = interrupt.signal() {
+        // The run ends by the signal whatever it returned. What stdout still
+        // holds is written first, and a failure to write it goes unreported.
+        let _ = output.flush();
         return interrupt::terminate(signal);
     }
     match result {

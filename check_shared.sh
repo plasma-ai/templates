@@ -30,9 +30,17 @@ fail() {
     STATUS=1
 }
 
-# print the lines of a file from one pattern through another
-span() {
-    sed -n "/$2/,/$3/p" "$1"
+# compare the lines from one pattern through another in a file of both
+# templates; an empty span fails too, since it would compare as equal
+compare_span() {
+    local ONE TWO
+    ONE=$(sed -n "/$2/,/$3/p" "$PYTHON/$1")
+    TWO=$(sed -n "/$2/,/$3/p" "$RUST/$1")
+    if [[ -z "$ONE" || -z "$TWO" ]]; then
+        fail "$4 is missing from $1 in python/ or rust/"
+    elif [[ "$ONE" != "$TWO" ]]; then
+        fail "$4 differs between python/ and rust/"
+    fi
 }
 
 # ------ whole files
@@ -50,16 +58,9 @@ done < <(find "$PYTHON" -type f -print0)
 # ------ shared spans of files that differ
 
 # the org-wide sections of AGENTS.md: the header, and Consistency onwards
-if ! diff -q \
-    <(span "$PYTHON/AGENTS.md" '^# AGENTS$' '^## Overview$') \
-    <(span "$RUST/AGENTS.md" '^# AGENTS$' '^## Overview$') >/dev/null; then
-    fail "the header of AGENTS.md differs between python/ and rust/"
-fi
-if ! diff -q \
-    <(span "$PYTHON/AGENTS.md" '^## Consistency$' '^## Code Style$') \
-    <(span "$RUST/AGENTS.md" '^## Consistency$' '^## Code Style$') >/dev/null; then
-    fail "AGENTS.md differs between python/ and rust/ from Consistency to Code Style"
-fi
+compare_span AGENTS.md '^# AGENTS$' '^## Overview$' "the header of AGENTS.md"
+compare_span AGENTS.md '^## Consistency$' '^## Code Style$' \
+    "AGENTS.md from Consistency to Code Style"
 
 # the pre-commit baseline: the Rust config is the Python one plus its own block
 SIZE=$(wc -c <"$PYTHON/.pre-commit-config.yaml")
@@ -68,10 +69,7 @@ if ! head -c "$SIZE" "$RUST/.pre-commit-config.yaml" | cmp -s - "$PYTHON/.pre-co
 fi
 
 # the ruff settings, up to the per-file ignores
-if ! diff -q \
-    <(span "$PYTHON/pyproject.toml" '^\[tool\.ruff\]$' '^\[tool\.ruff\.lint\.per-file-ignores\]$') \
-    <(span "$RUST/pyproject.toml" '^\[tool\.ruff\]$' '^\[tool\.ruff\.lint\.per-file-ignores\]$') >/dev/null; then
-    fail "the ruff settings in pyproject.toml differ between python/ and rust/"
-fi
+compare_span pyproject.toml '^\[tool\.ruff\]$' '^\[tool\.ruff\.lint\.per-file-ignores\]$' \
+    "the ruff settings of pyproject.toml"
 
 exit "$STATUS"

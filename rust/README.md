@@ -76,7 +76,7 @@ template changes before scaffolding.
        "default_python": "3.14",
        "rust_toolchain": "1.100.0",
        "project": {
-           "name": "tool-name",
+           "name": "tool_name",
            "package": "package-name",
            "title": "Tool Name",
            "description": "Description of tool.",
@@ -106,8 +106,8 @@ template changes before scaffolding.
      Docs (required)
    - `rust_toolchain` — exact stable Rust release for `rust-toolchain.toml` and
      `rust-version`, e.g. `1.100.0` (required)
-   - `project.name` — tool name: the binary, the skill folder, and with dashes
-     the crate prefix
+   - `project.name` — tool name, in lowercase letters, digits and underscores:
+     the binary, the skill folder, and with dashes the crate prefix
    - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
    - `project.description` — one-line description

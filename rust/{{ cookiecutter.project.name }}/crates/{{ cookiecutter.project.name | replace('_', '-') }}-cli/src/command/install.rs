@@ -48,17 +48,14 @@ pub(crate) fn run(
             .as_deref()
             .ok_or(CommandError::NoHomeDirectory)?
     };
+    let source = Path::new(skill::SOURCE_DIR);
     let (skills, verb) = if args.link {
-        (skill::link(Path::new(skill::SOURCE_DIR), root)?, "Linked")
+        (skill::link(source, root)?, "Linked")
     } else {
-        (skill::install(root)?, "Installed")
+        (skill::install(source, root)?, "Installed")
     };
     for skill in skills {
-        output.status(&format!(
-            "{verb} {} -> {}.",
-            skill.name,
-            skill.path.display()
-        ))?;
+        output.status(&format!("{verb} {} -> {:?}.", skill.name, skill.path))?;
     }
     Ok(CommandOutcome::Success)
 }
