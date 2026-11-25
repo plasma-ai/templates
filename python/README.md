@@ -1,6 +1,6 @@
-# Package Template
+# Python Template
 
-Template for Plasma packages.
+Template for Plasma Python packages.
 
 ## Prerequisites
 
@@ -110,7 +110,7 @@ template changes before scaffolding.
 2. Run `init.sh` from the parent of where the project will be created:
 
    ```bash
-   bash templates/package/init.sh <name> --context=<path> --org=<org>
+   bash templates/init.sh <name> --template=python --context=<path> --org=<org>
    ```
 
    - `name` is the repository name — the scaffold directory is renamed to it

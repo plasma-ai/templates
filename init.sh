@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Initialize a repository from the Plasma package template
-# --------------------------------------------------------
+# Initialize a repository from a Plasma template
+# ----------------------------------------------
 
 # ------ argument parsing
 
 NAME=""
+TEMPLATE=""
 CONTEXT=""
 ORG=""
 GIT_USER=""
@@ -15,17 +16,18 @@ LOCAL=false
 
 usage() {
     cat <<USAGE
-Usage: init.sh <name> --context <path> --org <org> [options]
+Usage: init.sh <name> --template <template> --context <path> --org <org> [options]
 
-Initialize a repository from the Plasma package template.
+Initialize a repository from a Plasma template.
 
 Options:
-    --context <path>    Cookiecutter context JSON file (required)
-    --org <org>         GitHub organization (required)
-    --user <user>       Git user name (default: global git config)
-    --email <email>     Git user email (default: global git config)
-    --local             Skip pushing to the remote
-    --help|-h           Show this help message
+    --template <template>    Template folder in this repository (required)
+    --context <path>         Cookiecutter context JSON file (required)
+    --org <org>              GitHub organization (required)
+    --user <user>            Git user name (default: global git config)
+    --email <email>          Git user email (default: global git config)
+    --local                  Skip pushing to the remote
+    --help|-h                Show this help message
 USAGE
     exit "${1:-0}"
 }
@@ -33,6 +35,18 @@ USAGE
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --help | -h) usage ;;
+        --template | --template=*)
+            if [[ "$1" == *=* ]]; then
+                TEMPLATE="${1#*=}"
+                shift
+            elif [[ $# -ge 2 ]]; then
+                TEMPLATE="$2"
+                shift 2
+            else
+                echo "Error: --template requires an argument" >&2
+                usage 1
+            fi
+            ;;
         --context | --context=*)
             if [[ "$1" == *=* ]]; then
                 CONTEXT="${1#*=}"
@@ -106,6 +120,10 @@ if [[ -z "$NAME" ]]; then
     echo "Error: repository name is required" >&2
     exit 1
 fi
+if [[ -z "$TEMPLATE" ]]; then
+    echo "Error: --template is required (a template folder in this repository)" >&2
+    exit 1
+fi
 if [[ -z "$CONTEXT" ]]; then
     echo "Error: --context is required (path to JSON context file)" >&2
     exit 1
@@ -116,6 +134,10 @@ if [[ -z "$ORG" ]]; then
 fi
 if [[ ! -f "$CONTEXT" ]]; then
     echo "Error: context file not found: $CONTEXT" >&2
+    exit 1
+fi
+if [[ ! -f "$(dirname "$0")/$TEMPLATE/cookiecutter.json" ]]; then
+    echo "Error: unknown template: $TEMPLATE" >&2
     exit 1
 fi
 if [[ -e "$NAME" ]]; then
@@ -140,7 +162,7 @@ if ! command -v python3 &>/dev/null; then
 fi
 
 # create project from template via cruft
-cruft create "https://github.com/$ORG/templates.git" --no-input --directory="package" -E "$CONTEXT"
+cruft create "https://github.com/$ORG/templates.git" --no-input --directory="$TEMPLATE" -E "$CONTEXT"
 
 # cookiecutter names the output dir from project.name; rename when the
 # repository name differs (e.g. an import package with underscores)
@@ -156,12 +178,20 @@ fi
 # below must match
 BRANCH=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('branch', 'main'))" "$CONTEXT")
 
-echo "Created $NAME from the package template"
+echo "Created $NAME from the $TEMPLATE template"
 
 # ------ post-scaffolding setup
 
 cd "$NAME"
 ln -s AGENTS.md CLAUDE.md
+
+# generate the Cargo lockfile for the initial commit -- a template cannot
+# ship one, since it names the workspace's own crates, and a hook would
+# regenerate it on every cruft update and diff
+# -q: suppress cargo's locking chatter
+if [[ -f Cargo.toml ]]; then
+    cargo generate-lockfile -q
+fi
 
 # initialize git on the context's default branch
 # -q: suppress git's init/commit chatter; the initialized summary below

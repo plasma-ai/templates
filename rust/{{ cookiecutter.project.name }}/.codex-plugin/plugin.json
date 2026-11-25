@@ -1,0 +1,17 @@
+{
+  "name": "{{ cookiecutter.project.name }}",
+  "version": "{{ cookiecutter.project.version }}",
+  "description": "{{ cookiecutter.project.description }}",
+  "author": {
+    "name": "{{ cookiecutter.project.authors[0].name }}",
+    "email": "{{ cookiecutter.project.authors[0].email }}"{% if cookiecutter.urls.domain %},
+    "url": "https://{{ cookiecutter.urls.domain }}"
+{%- endif %}
+  },
+  "skills": "./{{ cookiecutter.project.name }}/skills/",
+  "interface": {
+    "displayName": "{{ cookiecutter.project.title }}",
+    "shortDescription": "{{ cookiecutter.project.description }}",
+    "category": "Development"
+  }
+}

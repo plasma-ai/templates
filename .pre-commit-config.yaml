@@ -8,6 +8,11 @@ repos:
         entry: reject
         language: fail
         files: \.rej$
+      - id: check-templates
+        name: check the templates
+        entry: check.sh
+        language: script
+        pass_filenames: false
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
