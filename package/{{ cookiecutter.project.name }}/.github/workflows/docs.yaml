@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - {{ cookiecutter.branch }}
+{%- if cookiecutter.rust.toolchain %}
+
+env:
+  CARGO_BUILD_WARNINGS: deny
+{%- endif %}
 
 jobs:
   docs:
@@ -18,9 +23,20 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
+{%- if cookiecutter.rust.toolchain %}
+      - name: Install Rust toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
+{%- endif %}
       - name: Install package with docs dependencies
         run: ./install.sh --all-extras --groups=docs
       - name: Generate API docs
         run: uv run --no-sync sphinx-apidoc -f -o docs {{ cookiecutter.project.name }}
       - name: Build docs
         run: uv run --no-sync sphinx-build -W docs docs/_build
+{%- if cookiecutter.rust.toolchain %}
+      - name: Build Rust docs
+        run: cargo doc --workspace --no-deps --document-private-items --locked
+{%- endif %}

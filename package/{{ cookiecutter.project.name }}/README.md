@@ -97,6 +97,16 @@ edits apply without re-running the install.
 
 Once installed, run tools with `uv run --no-sync <command>`, or activate the
 environment first (`source .venv/bin/activate`).
+{%- if cookiecutter.rust.toolchain %}
+
+The Cargo workspace needs [rustup](https://rustup.rs). Install the toolchain
+pinned in `rust-toolchain.toml`, and the cargo tools at the versions the
+workflows name:
+
+```bash
+rustup toolchain install
+```
+{%- endif %}
 
 ### Tests
 
@@ -105,6 +115,14 @@ Run the test suite:
 ```bash
 pytest .
 ```
+{%- if cookiecutter.rust.toolchain %}
+
+Run the Rust test suite:
+
+```bash
+cargo nextest run
+```
+{%- endif %}
 
 ### Linting
 

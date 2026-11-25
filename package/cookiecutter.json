@@ -3,6 +3,9 @@
     "branch": "main",
     "python": "",
     "default_python": "",
+    "rust": {
+        "toolchain": ""
+    },
     "project": {
         "name": "",
         "package": "",

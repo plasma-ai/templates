@@ -7,6 +7,7 @@ Template for Plasma packages.
 - Python 3.11+
 - [Cruft](https://cruft.github.io/cruft/)
 - Git
+- [rustup](https://rustup.rs), for a project with a Rust workspace
 
 ## What You Get
 
@@ -46,6 +47,25 @@ Template for Plasma packages.
 └── README.md
 ```
 
+A context that sets `rust.toolchain` adds a Cargo workspace beside the Python
+package:
+
+```text
+<package>/
+├── .config/
+│   └── nextest.toml       Test runner profile for CI
+├── crates/
+│   └── <package>-core/    Domain library, with its integration test binary
+├── Cargo.toml             Workspace manifest: versions, lints, profiles
+├── clippy.toml            Clippy configuration
+├── deny.toml              Dependency policy
+├── rust-toolchain.toml    Pinned toolchain
+└── rustfmt.toml           Formatter configuration
+```
+
+It also adds the Rust block to `.gitignore`, the cargo hooks to
+`.pre-commit-config.yaml`, and the Rust steps and jobs to the four workflows.
+
 ## Codecov
 
 1. Go to `codecov.io/gh/<org>` and add the repository.
@@ -65,6 +85,7 @@ template changes before scaffolding.
        "branch": "main",
        "python": ">=3.11,<3.15",
        "default_python": "3.14",
+       "rust": {"toolchain": ""},
        "project": {
            "name": "project-name",
            "package": "package-name",
@@ -93,6 +114,8 @@ template changes before scaffolding.
    - `python` — Python version constraint for `requires-python` (required)
    - `default_python` — Python version for `.python-version`, CI, and Read the
      Docs (required)
+   - `rust.toolchain` — exact stable Rust release for `rust-toolchain.toml` and
+     `rust-version`, e.g. `1.100.0` (optional, adds the Cargo workspace)
    - `project.name` — Python package name (directory and import name)
    - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
@@ -119,6 +142,9 @@ template changes before scaffolding.
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 
+   With `rust.toolchain` set, `init.sh` also runs `cargo generate-lockfile`, so
+   the initial commit carries `Cargo.lock`.
+
 ## Sphinx
 
 Generate API documentation (`<package>` is `project.name`, the import package
@@ -139,4 +165,12 @@ Check for upstream template changes:
 uv sync --inexact --group lint
 uv run --no-sync cruft check
 uv run --no-sync cruft update
+```
+
+Add the Cargo workspace to an existing project by setting the toolchain in its
+context, then generate and commit the lockfile:
+
+```bash
+uv run --no-sync cruft update --variables-to-update '{"rust": {"toolchain": "<X.Y.Z>"}}'
+cargo generate-lockfile
 ```

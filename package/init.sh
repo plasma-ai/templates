@@ -139,6 +139,14 @@ if ! command -v python3 &>/dev/null; then
     exit 1
 fi
 
+# a context that pins a Rust toolchain scaffolds a Cargo workspace, whose
+# lockfile is generated after scaffolding
+RUST=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('rust', {}).get('toolchain', ''))" "$CONTEXT")
+if [[ -n "$RUST" ]] && ! command -v cargo &>/dev/null; then
+    echo "Error: cargo is required (https://rustup.rs)" >&2
+    exit 1
+fi
+
 # create project from template via cruft
 cruft create "https://github.com/$ORG/templates.git" --no-input --directory="package" -E "$CONTEXT"
 
@@ -162,6 +170,13 @@ echo "Created $NAME from the package template"
 
 cd "$NAME"
 ln -s AGENTS.md CLAUDE.md
+
+# generate the Cargo lockfile so the initial commit carries it: it names the
+# workspace's own crates, so the template cannot ship one
+# --quiet: suppress cargo's locking chatter
+if [[ -n "$RUST" ]]; then
+    cargo generate-lockfile --quiet
+fi
 
 # initialize git on the context's default branch
 # -q: suppress git's init/commit chatter; the initialized summary below

@@ -17,6 +17,13 @@ __MACOSX/
 .AppleDouble
 .LSOverride
 Icon?
+{%- if cookiecutter.rust.toolchain %}
+
+# Rust
+target/
+*.pending-snap
+*.snap.new
+{%- endif %}
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

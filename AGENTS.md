@@ -13,6 +13,12 @@ Files under `package/` are cookiecutter output — keep every `{{ ... }}`
 placeholder and `{% raw %}`/`{% endraw %}` guard intact, and remember that edits
 here propagate to every derived repository via `cruft update`.
 
+The Cargo workspace is optional: `package/hooks/post_gen_project.py` removes its
+files from a project whose context sets no `rust.toolchain`. List every new
+Rust-only path there, and wrap every Rust addition to a shared file in
+`{%- if cookiecutter.rust.toolchain %}`, so a project without Rust renders
+exactly as before.
+
 ## Build & Development
 
 The repository is cookiecutter sources, so there is no build step. Run
