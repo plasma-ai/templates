@@ -20,7 +20,7 @@ project's lint job compares only its own folder with the template's head. Keep
 symlinks, includes and hooks from reaching outside a folder.
 
 A change to text both templates share goes to both folders in one commit;
-`check_shared.sh`, a pre-commit hook, fails when that text differs.
+`check.sh`, a pre-commit hook, fails when that text differs.
 
 ## Build & Development
 
@@ -29,7 +29,7 @@ pre-commit to format and lint the repo — paths containing `{{ ... }}`
 placeholders skip the parsing hooks (JSON/YAML checkers, mdformat, and the shell
 hooks; placeholders are not valid to parse or reformat) but keep the safety
 hooks (forbidden files, whitespace, merge conflicts, private keys); everything
-else (`init.sh`, `check_shared.sh`, and each template's `README.md` and
+else (`init.sh`, `check.sh`, and each template's `README.md` and
 `cookiecutter.json`) is fully checked:
 
 ```bash

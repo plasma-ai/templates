@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Check that the text the templates share has not drifted
-# -------------------------------------------------------
+# Check the templates
+# -------------------
 
 cd "$(dirname "$0")"
 
@@ -47,7 +47,7 @@ compare_span() {
     fi
 }
 
-# ------ whole files
+# ------ shared files
 
 # a file both templates render is identical unless it is listed above
 while IFS= read -r -d '' FILE; do
