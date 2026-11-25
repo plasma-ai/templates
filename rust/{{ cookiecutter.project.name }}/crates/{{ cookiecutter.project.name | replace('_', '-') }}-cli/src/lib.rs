@@ -71,8 +71,7 @@ fn install_panic_hook() {
     let default_hook = panic::take_hook();
     panic::set_hook(Box::new(move |info| {
         default_hook(info);
-        // The process is already failing, and stderr is the only place left to
-        // report a failed write to.
+        // A failed write to stderr has nowhere to be reported.
         let _ = writeln!(
             io::stderr(),
             "This is a bug in {{ cookiecutter.project.name }} {}. Please report it at {ISSUES_URL}.",

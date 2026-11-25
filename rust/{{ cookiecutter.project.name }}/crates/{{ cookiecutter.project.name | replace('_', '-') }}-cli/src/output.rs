@@ -79,9 +79,8 @@ impl Output {
     /// Writes a failure to stderr: the error, each of its causes, then the
     /// hints.
     pub(crate) fn error(&mut self, error: &CommandError) {
-        // The failure is reported whether or not stdout can still be written.
+        // A failed flush or write here has nowhere to be reported.
         let _ = self.flush();
-        // A failed write to stderr has nowhere to be reported.
         let _ = self.write_error(error);
     }
 
