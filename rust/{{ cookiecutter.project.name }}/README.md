@@ -38,8 +38,7 @@ pip install {{ cookiecutter.project.package }}
 Use `pipx install` or `uv tool install` to install the command in an isolated
 environment.
 
-Ready-built wheels cover macOS on Apple silicon and Linux on x86_64 and arm64,
-with glibc or musl. On any other platform the install builds from source, which
+On a platform with no ready-built wheel, the install builds from source, which
 needs a Rust toolchain.
 
 ### Skill
@@ -88,8 +87,8 @@ The workspace needs [rustup](https://rustup.rs). Install the toolchain pinned in
 rustup toolchain install
 ```
 
-The test and supply-chain commands need cargo-nextest, cargo-deny and
-cargo-shear, at the versions the workflows name.
+The tests need cargo-nextest, and the supply-chain checks need cargo-deny and
+cargo-shear. Install each at the version the workflows pin.
 
 Run `install.sh` in the repository root. With no environment active it creates
 and uses a local `.venv`; with one active (e.g. pyenv) it installs into that
@@ -99,14 +98,20 @@ environment, without recreating it:
 ./install.sh --groups=lint,docs
 ```
 
-Run `./install.sh --help` for all options. The install compiles the binary into
-the environment. After a change under `crates/`, re-run it to rebuild the
-binary, or run the change directly with `cargo run`.
+Run `./install.sh --help` for all options. Alternatively, run
+`uv sync --group lint --group docs` and `uv run pre-commit install` to set up
+the environment manually.
 
-With a binary built in a clone, the install command's `--link` option symlinks
-the skill folder of that clone into the agent skill directories instead of
-copying it, so skill edits apply without re-running the install. A binary from a
-released wheel has no clone to link to.
+The install compiles the binary into the environment. After a change under
+`crates/`, re-run it to rebuild the binary, or run the change directly with
+`cargo run`.
+
+With a binary built in a development clone, the install command's `--link`
+option symlinks the skill folder of that clone into the agent skill directories
+instead of copying it, so skill edits apply without re-running the install.
+
+Once installed, run tools with `uv run --no-sync <command>`, or activate the
+environment first (`source .venv/bin/activate`).
 
 ### Tests
 

@@ -16,7 +16,6 @@ clap = "4.6.10"
 clap_complete = "4.6.12"
 include_dir = "0.7.4"
 insta = "1.49.0"
-signal-hook = "0.4.6"
 tempfile = "3.27.0"
 thiserror = "2.0.21"
 
@@ -32,7 +31,7 @@ unused_lifetimes = "warn"
 unused_qualifications = "warn"
 
 [workspace.lints.clippy]
-# restriction: house rules
+# restriction
 allow_attributes = "warn"
 allow_attributes_without_reason = "warn"
 dbg_macro = "warn"
@@ -47,7 +46,7 @@ undocumented_unsafe_blocks = "warn"
 unimplemented = "warn"
 unused_trait_names = "warn"
 unwrap_used = "warn"
-# pedantic: chosen one by one
+# pedantic
 cast_lossless = "warn"
 cast_possible_truncation = "warn"
 cast_possible_wrap = "warn"

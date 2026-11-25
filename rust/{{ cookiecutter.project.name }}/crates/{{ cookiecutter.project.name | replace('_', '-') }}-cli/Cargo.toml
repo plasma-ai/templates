@@ -18,7 +18,6 @@ anstyle.workspace = true
 clap = { workspace = true, features = ["derive"] }
 clap_complete.workspace = true
 {{ cookiecutter.project.name | replace('_', '-') }}-core.workspace = true
-signal-hook.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]

@@ -1,13 +1,10 @@
 //! The commands, their dispatch, and the result every command returns.
 
-use std::io;
-
 use clap::Subcommand;
 use {{ cookiecutter.project.name }}_core::skill::InstallSkillsError;
 use {{ cookiecutter.project.name }}_core::skill::LinkSkillsError;
 
 use crate::config::Config;
-use crate::interrupt::Interrupt;
 use crate::output::Output;
 use crate::output::StdoutError;
 
@@ -28,10 +25,9 @@ impl Command {
         &self,
         output: &mut Output,
         config: &Config,
-        interrupt: &Interrupt,
     ) -> Result<CommandOutcome, CommandError> {
         match self {
-            Self::Install(args) => install::run(output, args, config, interrupt),
+            Self::Install(args) => install::run(output, args, config),
             Self::Completion(args) => completion::run(output, args),
         }
     }
@@ -39,15 +35,13 @@ impl Command {
 
 /// A command's own answer, which the exit status reports.
 #[derive(Debug)]
+#[must_use]
 pub(crate) enum CommandOutcome {
-    /// The command did what was asked, or its answer is yes.
+    /// The command did what was asked.
     Success,
-    /// The command ran and its answer is no, as when a check finds a problem.
-    #[expect(dead_code, reason = "no command has a negative answer yet")]
-    Negative,
 }
 
-/// Every failure the binary reports, sorted for the exit mapping in `main`.
+/// Every failure the binary reports, one variant per kind.
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum CommandError {
     /// A write to stdout failed.
@@ -56,15 +50,12 @@ pub(crate) enum CommandError {
     /// The bundled skills could not be installed.
     #[error(transparent)]
     InstallSkills(#[from] InstallSkillsError),
-    /// The skills of the source checkout could not be linked.
+    /// The skills of the development clone could not be linked.
     #[error(transparent)]
     LinkSkills(#[from] LinkSkillsError),
     /// The environment names no home directory.
     #[error("cannot find the home directory, because `HOME` is not set")]
     NoHomeDirectory,
-    /// The handlers for SIGINT and SIGTERM could not be installed.
-    #[error("cannot watch for an interrupt")]
-    WatchSignals(#[source] io::Error),
 }
 
 impl CommandError {
@@ -73,13 +64,9 @@ impl CommandError {
         match self {
             Self::NoHomeDirectory => &["pass `--project` to install into the current directory"],
             Self::LinkSkills(LinkSkillsError::ReadSource(_)) => &[
-                "`--link` needs a binary built in a development clone",
-                "run `install` without `--link` to copy the skill",
+                "`--link` works only for a binary built in a development clone; run `install` without it to copy the skill",
             ],
-            Self::Stdout(_)
-            | Self::InstallSkills(_)
-            | Self::LinkSkills(_)
-            | Self::WatchSignals(_) => &[],
+            Self::Stdout(_) | Self::InstallSkills(_) | Self::LinkSkills(_) => &[],
         }
     }
 }

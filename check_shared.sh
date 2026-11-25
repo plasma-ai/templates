@@ -33,13 +33,17 @@ fail() {
 # compare the lines from one pattern through another in a file of both
 # templates; an empty span fails too, since it would compare as equal
 compare_span() {
-    local ONE TWO
-    ONE=$(sed -n "/$2/,/$3/p" "$PYTHON/$1")
-    TWO=$(sed -n "/$2/,/$3/p" "$RUST/$1")
-    if [[ -z "$ONE" || -z "$TWO" ]]; then
-        fail "$4 is missing from $1 in python/ or rust/"
-    elif [[ "$ONE" != "$TWO" ]]; then
-        fail "$4 differs between python/ and rust/"
+    local FILE="$1"
+    local START="$2"
+    local END="$3"
+    local LABEL="$4"
+    local PYTHON_SPAN RUST_SPAN
+    PYTHON_SPAN=$(sed -n "/$START/,/$END/p" "$PYTHON/$FILE")
+    RUST_SPAN=$(sed -n "/$START/,/$END/p" "$RUST/$FILE")
+    if [[ -z "$PYTHON_SPAN" || -z "$RUST_SPAN" ]]; then
+        fail "$LABEL is missing from python/ or rust/"
+    elif [[ "$PYTHON_SPAN" != "$RUST_SPAN" ]]; then
+        fail "$LABEL differs between python/ and rust/"
     fi
 }
 
@@ -57,7 +61,7 @@ done < <(find "$PYTHON" -type f -print0)
 
 # ------ shared spans of files that differ
 
-# the org-wide sections of AGENTS.md: the header, and Consistency onwards
+# the org-wide sections of AGENTS.md: the header, and Consistency up to Code Style
 compare_span AGENTS.md '^# AGENTS$' '^## Overview$' "the header of AGENTS.md"
 compare_span AGENTS.md '^## Consistency$' '^## Code Style$' \
     "AGENTS.md from Consistency to Code Style"
@@ -68,8 +72,10 @@ if ! head -c "$SIZE" "$RUST/.pre-commit-config.yaml" | cmp -s - "$PYTHON/.pre-co
     fail ".pre-commit-config.yaml of rust/ does not start with that of python/"
 fi
 
-# the ruff settings, up to the per-file ignores
+# the ruff settings, apart from the per-file ignores
 compare_span pyproject.toml '^\[tool\.ruff\]$' '^\[tool\.ruff\.lint\.per-file-ignores\]$' \
-    "the ruff settings of pyproject.toml"
+    "the ruff configuration of pyproject.toml"
+compare_span pyproject.toml '^\[tool\.ruff\.lint\.isort\]$' '^suppress-dummy-args = ' \
+    "the ruff configuration after the per-file ignores of pyproject.toml"
 
 exit "$STATUS"

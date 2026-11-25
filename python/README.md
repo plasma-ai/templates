@@ -1,6 +1,6 @@
-# Package Template
+# Python Template
 
-Template for Plasma packages.
+Template for Plasma Python packages.
 
 ## Prerequisites
 

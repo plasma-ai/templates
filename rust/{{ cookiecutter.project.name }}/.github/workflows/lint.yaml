@@ -26,10 +26,12 @@ jobs:
           cache-dependency-glob: "**/pyproject.toml"
       - name: Install Rust toolchain
         run: rustup toolchain install
-      - uses: Swatinem/rust-cache@v2
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
         with:
-          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
-      - uses: taiki-e/install-action@v2
+          save-if: {% raw %}${{ github.event_name == 'push' }}{% endraw %}
+      - name: Install cargo tools
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-deny@0.22.1,cargo-shear@1.14.1
       - name: Cache pre-commit hooks
@@ -39,8 +41,6 @@ jobs:
           key: {% raw %}pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}{% endraw %}
       - name: Run pre-commit
         run: uvx pre-commit run --all-files --show-diff-on-failure --color=always
-      # compare this project's template folder only, so a change to another
-      # template in the same repository does not fail the check
       - name: Check that project is up-to-date with template
         run: |
           template=$(jq -r .template .cruft.json)
@@ -67,7 +67,8 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install Rust toolchain
         run: rustup toolchain install
-      - uses: taiki-e/install-action@v2
+      - name: Install cargo tools
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-deny@0.22.1
       - name: Check Rust advisories

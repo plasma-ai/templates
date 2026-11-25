@@ -10,8 +10,8 @@ workspace = true
 
 [dependencies]
 include_dir.workspace = true
-tempfile.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true
+tempfile.workspace = true

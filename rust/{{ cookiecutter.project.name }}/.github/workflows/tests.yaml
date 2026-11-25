@@ -13,7 +13,7 @@ env:
 
 jobs:
   tests:
-    name: tests ({% raw %}${{ matrix.os }}{% endraw %})
+    name: tests
     runs-on: {% raw %}${{ matrix.os }}{% endraw %}
     strategy:
       fail-fast: false
@@ -25,10 +25,12 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install Rust toolchain
         run: rustup toolchain install
-      - uses: Swatinem/rust-cache@v2
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
         with:
-          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
-      - uses: taiki-e/install-action@v2
+          save-if: {% raw %}${{ github.event_name == 'push' }}{% endraw %}
+      - name: Install cargo tools
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest@0.9.152,cargo-llvm-cov@0.9.2
       - name: Run tests

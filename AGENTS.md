@@ -7,8 +7,8 @@ parent directories), also check the parent directory for `AGENTS.md`.
 ## Overview
 
 This repository hosts the org's `cookiecutter` templates: `python/` is the
-boilerplate every org Python package derives from, and `rust/` the boilerplate
-for a command-line tool written in Rust.
+canonical boilerplate every org Python package derives from, and `rust/` the
+canonical boilerplate for a command-line tool written in Rust.
 
 Files under a template's `{{ cookiecutter.project.name }}/` folder are
 cookiecutter output — keep every `{{ ... }}` placeholder and
@@ -19,14 +19,8 @@ Each template folder is self-contained: cruft renders one folder, and a
 project's lint job compares only its own folder with the template's head. Keep
 symlinks, includes and hooks from reaching outside a folder.
 
-A change to text both templates share goes to both folders in one commit.
-`check_shared.sh`, a pre-commit hook, fails when a file both render differs
-without being on its list, or when a shared section of `AGENTS.md`, the
-pre-commit baseline or the ruff settings differs.
-
-`rust/hooks/post_gen_project.py` runs `cargo fmt` on the rendered sources,
-because rustfmt orders imports and breaks lines by the rendered project name,
-which the template's text cannot follow.
+A change to text both templates share goes to both folders in one commit;
+`check_shared.sh`, a pre-commit hook, fails when that text differs.
 
 ## Build & Development
 
@@ -35,8 +29,8 @@ pre-commit to format and lint the repo — paths containing `{{ ... }}`
 placeholders skip the parsing hooks (JSON/YAML checkers, mdformat, and the shell
 hooks; placeholders are not valid to parse or reformat) but keep the safety
 hooks (forbidden files, whitespace, merge conflicts, private keys); everything
-else (`init.sh`, `check_shared.sh`, and each template's `README.md`,
-`cookiecutter.json` and `hooks/`) is fully checked:
+else (`init.sh`, `check_shared.sh`, and each template's `README.md` and
+`cookiecutter.json`) is fully checked:
 
 ```bash
 pre-commit run --all-files

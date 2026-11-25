@@ -25,12 +25,12 @@ fn help_describes_every_command_and_option() -> TestResult {
 
     Global Options:
           --color <WHEN>  Control when output is colored [default: auto] [possible values: auto, always, never]
-      -q, --quiet         Print no status messages or hints
+      -q, --quiet         Print no status messages
     ");
     assert_snapshot!(sandbox.run(&["install", "--help"])?, @"
     Install the {{ cookiecutter.project.name }} skill for Claude Code and Codex
 
-    Copies the bundled skill into the Claude (`.claude/skills`) and Codex (`.agents/skills`) skill directories, replacing any earlier copy. The directories are those of your home directory, or of the current directory with `--project`.
+    Copies the bundled skill into the Claude (.claude/skills) and Codex (.agents/skills) skill directories, replacing any earlier copy. Targets your home directory by default, or the current directory with --project.
 
     Usage: {{ cookiecutter.project.name }} install [OPTIONS]
 
@@ -39,9 +39,9 @@ fn help_describes_every_command_and_option() -> TestResult {
               Install into the current directory instead of the home directory
 
           --link
-              Link the skill of this source checkout instead of copying it
+              Link the skill of the development clone instead of copying it
 
-              An edit to the skill then applies with no further install. This works for a binary built in a development clone, which is where it links to.
+              Edits to the skill then apply without reinstalling. Only a binary built in a development clone can link.
 
       -h, --help
               Print help (see a summary with '-h')
@@ -54,34 +54,22 @@ fn help_describes_every_command_and_option() -> TestResult {
               [possible values: auto, always, never]
 
       -q, --quiet
-              Print no status messages or hints
+              Print no status messages
     ");
     assert_snapshot!(sandbox.run(&["completion", "--help"])?, @"
     Print a shell completion script
 
-    Writes the script for the given shell to stdout. The shell's own manual says where a completion script is installed.
-
     Usage: {{ cookiecutter.project.name }} completion [OPTIONS] <SHELL>
 
     Arguments:
-      <SHELL>
-              Shell to write the script for
-
-              [possible values: bash, elvish, fish, powershell, zsh]
+      <SHELL>  Shell to write the script for [possible values: bash, elvish, fish, powershell, zsh]
 
     Options:
-      -h, --help
-              Print help (see a summary with '-h')
+      -h, --help  Print help
 
     Global Options:
-          --color <WHEN>
-              Control when output is colored
-
-              [default: auto]
-              [possible values: auto, always, never]
-
-      -q, --quiet
-              Print no status messages or hints
+          --color <WHEN>  Control when output is colored [default: auto] [possible values: auto, always, never]
+      -q, --quiet         Print no status messages
     ");
     Ok(())
 }

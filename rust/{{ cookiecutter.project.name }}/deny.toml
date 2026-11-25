@@ -4,13 +4,9 @@ all-features = true
 [advisories]
 unmaintained = "workspace"
 yanked = "deny"
-ignore = [
-    # { id = "RUSTSEC-YYYY-NNNN", reason = "<dependency path>; remove when <condition>" },
-]
 
 [licenses]
 allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
-confidence-threshold = 0.93
 
 [licenses.private]
 ignore = true
@@ -19,9 +15,6 @@ ignore = true
 multiple-versions = "warn"
 wildcards = "deny"
 allow-wildcard-paths = true
-deny = [
-    # { name = "<crate>", reason = "use <preferred crate>" },
-]
 
 [sources]
 unknown-registry = "deny"

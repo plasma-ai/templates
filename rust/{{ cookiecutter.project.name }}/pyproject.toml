@@ -25,14 +25,13 @@ Documentation = "https://{{ cookiecutter.urls.docs }}"
 Changelog = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/blob/{{ cookiecutter.branch }}/CHANGELOG.md"
 
 [tool.maturin]
-bindings = "bin"
-# the sdist carries what a source build reads beyond the crates
-include = [
-    { path = "CHANGELOG.md", format = "sdist" },
-    { path = "rust-toolchain.toml", format = "sdist" },
-    { path = "{{ cookiecutter.project.name }}/skills/**/*", format = "sdist" },
-]
 manifest-path = "crates/{{ cookiecutter.project.name | replace('_', '-') }}-cli/Cargo.toml"
+bindings = "bin"
+include = [
+    { path = "CHANGELOG.md", format = ["sdist"] },
+    { path = "rust-toolchain.toml", format = ["sdist"] },
+    { path = "{{ cookiecutter.project.name }}/skills/**/*", format = ["sdist"] },
+]
 
 [dependency-groups]
 docs = [
@@ -48,7 +47,6 @@ lint = [
 [tool.uv]
 required-version = ">=0.8"
 default-groups = []
-# every file the native build reads, so an edit rebuilds the binary
 cache-keys = [
     { file = "pyproject.toml" },
     { file = "Cargo.toml" },

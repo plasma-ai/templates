@@ -23,9 +23,10 @@ jobs:
           cache-dependency-glob: "**/pyproject.toml"
       - name: Install Rust toolchain
         run: rustup toolchain install
-      - uses: Swatinem/rust-cache@v2
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
         with:
-          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
+          save-if: {% raw %}${{ github.event_name == 'push' }}{% endraw %}
       - name: Install docs dependencies
         run: uv sync --no-install-project --group docs
       - name: Build docs

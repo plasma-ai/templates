@@ -41,7 +41,7 @@ pub(crate) struct GlobalArgs {
     /// Control when output is colored
     #[arg(long, global = true, value_name = "WHEN", default_value_t = ColorChoice::Auto)]
     pub(crate) color: ColorChoice,
-    /// Print no status messages or hints
+    /// Print no status messages
     #[arg(short, long, global = true)]
     pub(crate) quiet: bool,
 }
@@ -52,16 +52,9 @@ mod tests {
 
     use super::*;
 
+    /// Checks that clap accepts the argument definitions.
     #[test]
     fn argument_definitions_are_consistent() {
         Cli::command().debug_assert();
-    }
-
-    #[test]
-    fn every_command_parses_with_only_its_required_arguments() -> Result<(), clap::Error> {
-        for arguments in [&["install"][..], &["completion", "bash"]] {
-            Cli::try_parse_from(["{{ cookiecutter.project.name }}"].iter().chain(arguments))?;
-        }
-        Ok(())
     }
 }

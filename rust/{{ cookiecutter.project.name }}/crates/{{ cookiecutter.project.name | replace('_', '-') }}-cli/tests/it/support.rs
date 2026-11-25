@@ -1,4 +1,4 @@
-//! Shared helpers for the tests: the hermetic runner of the `{{ cookiecutter.project.name }}` binary.
+//! Helpers shared by the tests in this binary: the hermetic runner of `{{ cookiecutter.project.name }}`.
 
 use std::env;
 use std::fmt;
@@ -10,10 +10,8 @@ use std::process::Stdio;
 
 use tempfile::TempDir;
 
+/// The result a fallible test returns.
 pub(crate) type TestResult<T = ()> = anyhow::Result<T>;
-
-/// The prefix of the temporary directory each test creates.
-const ROOT_PREFIX: &str = "{{ cookiecutter.project.name }}-test-";
 
 /// A test's own root directory, holding the home, temporary and working
 /// directories the binary runs with.
@@ -25,7 +23,9 @@ pub(crate) struct Sandbox {
 impl Sandbox {
     /// Creates the root and its three directories.
     pub(crate) fn new() -> TestResult<Self> {
-        let guard = tempfile::Builder::new().prefix(ROOT_PREFIX).tempdir()?;
+        let guard = tempfile::Builder::new()
+            .prefix("{{ cookiecutter.project.name }}-test-")
+            .tempdir()?;
         // A temporary directory is often behind a symlink, and the binary
         // prints real paths.
         let root = guard.path().canonicalize()?;
@@ -46,12 +46,6 @@ impl Sandbox {
     /// Returns the directory the binary runs in.
     pub(crate) fn work(&self) -> PathBuf {
         self.root.join("work")
-    }
-
-    /// Writes a fixture file at `path`, relative to the root.
-    pub(crate) fn write_file(&self, path: &str, contents: &str) -> TestResult {
-        fs::write(self.root.join(path), contents)?;
-        Ok(())
     }
 
     /// Builds the command that runs the binary with `args`.

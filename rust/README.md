@@ -5,9 +5,9 @@ binary wheel.
 
 ## Prerequisites
 
+- Python 3.11+
 - [rustup](https://rustup.rs)
 - [Cruft](https://cruft.github.io/cruft/)
-- [uv](https://docs.astral.sh/uv/)
 - Git
 
 Rendering the template runs `cargo fmt`, so `cruft create`, `cruft update` and
@@ -38,22 +38,18 @@ Rendering the template runs `cargo fmt`, so `cruft create`, `cruft update` and
 ├── .python-version
 ├── .readthedocs.yaml
 ├── AGENTS.md
-├── CLAUDE.md -> AGENTS.md
 ├── Cargo.lock
-├── Cargo.toml             Workspace manifest: versions, lints, profiles
-├── clippy.toml            Clippy configuration
+├── Cargo.toml
+├── CLAUDE.md -> AGENTS.md
+├── clippy.toml
 ├── codecov.yaml
-├── deny.toml              Dependency policy
+├── deny.toml
 ├── install.sh
-├── pyproject.toml         Wheel metadata and the maturin build
+├── pyproject.toml
 ├── README.md
-├── rust-toolchain.toml    Pinned toolchain
-└── rustfmt.toml           Formatter configuration
+├── rust-toolchain.toml
+└── rustfmt.toml
 ```
-
-The binary starts with `--version`, an `install` command for the skill and a
-`completion` command. The wheel holds the binary and nothing else: the project
-has no Python package.
 
 ## Codecov
 
@@ -106,8 +102,8 @@ template changes before scaffolding.
      Docs (required)
    - `rust_toolchain` — exact stable Rust release for `rust-toolchain.toml` and
      `rust-version`, e.g. `1.100.0` (required)
-   - `project.name` — tool name, in lowercase letters, digits and underscores:
-     the binary, the skill folder, and with dashes the crate prefix
+   - `project.name` — tool name (binary, skill folder and crate prefix), in
+     lowercase letters, digits and underscores, starting with a letter
    - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
    - `project.description` — one-line description
@@ -129,13 +125,9 @@ template changes before scaffolding.
    ```
 
    - `name` is the repository name — the scaffold directory is renamed to it
-     when it differs from `project.name`.
-   - `template` is this template's folder, `rust`.
+     when it differs from `project.name` (e.g. a tool name with underscores).
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
-
-   `init.sh` also runs `cargo generate-lockfile`, so the initial commit carries
-   `Cargo.lock`.
 
 ## Cruft
 
@@ -145,12 +137,4 @@ Check for upstream template changes:
 uv sync --inexact --group lint
 uv run --no-sync cruft check
 uv run --no-sync cruft update
-```
-
-Raise the pinned toolchain by changing the context, then refresh and commit the
-lockfile:
-
-```bash
-uv run --no-sync cruft update --variables-to-update '{"rust_toolchain": "<X.Y.Z>"}'
-cargo update
 ```

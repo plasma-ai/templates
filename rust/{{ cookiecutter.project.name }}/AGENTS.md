@@ -30,8 +30,7 @@ below):
 # install the pinned Rust toolchain (reads rust-toolchain.toml)
 rustup toolchain install
 
-# install dev dependencies and build the binary (creates a .venv if none is
-# active)
+# install dev dependencies and the binary (creates a .venv if none is active)
 ./install.sh --groups=lint,docs
 
 # or set up the environment manually
@@ -47,6 +46,10 @@ cargo test --doc
 
 # run pre-commit
 uv run --no-sync pre-commit run [--all-files]
+
+# run supply-chain checks
+cargo deny --locked check bans licenses sources
+cargo shear --locked
 ```
 
 The Cargo workspace under `crates/` is tested with `cargo-nextest`, and the
@@ -364,5 +367,5 @@ One load-bearing sentence beats four explanatory ones.
 No absolute paths in persisted data — everything should be relative or derivable
 from the git repo root.
 
-See `Cargo.toml` for the lint table, and `clippy.toml` and `rustfmt.toml` for
-the linter and formatter config.
+See `Cargo.toml` for the lint table, `clippy.toml` for the linter config, and
+the `cargo-fmt` hook in `.pre-commit-config.yaml` for the formatter config.

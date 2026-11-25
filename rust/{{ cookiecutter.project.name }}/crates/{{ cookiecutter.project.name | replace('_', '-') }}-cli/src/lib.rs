@@ -14,13 +14,11 @@ use crate::cli::Cli;
 use crate::command::CommandError;
 use crate::command::CommandOutcome;
 use crate::config::Config;
-use crate::interrupt::Interrupt;
 use crate::output::Output;
 
 mod cli;
 mod command;
 mod config;
-mod interrupt;
 mod output;
 
 /// Where a bug in the program is reported.
@@ -28,36 +26,28 @@ const ISSUES_URL: &str = "https://github.com/{{ cookiecutter.github.org or cooki
 
 /// Runs the command line and returns the status the process exits with.
 ///
-/// A positive outcome exits 0 and a negative one 1. A failure is printed and
-/// exits 2, as a usage error does; a reader that closed stdout early is not a
-/// failure and exits 0. A run that received SIGINT or SIGTERM ends by that
-/// signal. A panic exits 101.
+/// A successful command exits 0, and exit 1 is left for a command's own
+/// negative answer. A failure is printed and exits 2, as a usage error does; a
+/// reader that closed stdout early is not a failure and exits 0. A run that
+/// received SIGINT or SIGTERM ends by that signal. A panic exits 101.
 pub fn main() -> ExitCode {
     install_panic_hook();
     let cli = Cli::parse_or_version();
     let config = Config::from_env();
-    let interrupt = Interrupt::new();
     let (color, quiet) = cli.as_ref().map_or((ColorChoice::Auto, false), |cli| {
         (cli.global.color, cli.global.quiet)
     });
     let mut output = Output::new(color, quiet);
     let result = match &cli {
-        Some(cli) => cli.command.run(&mut output, &config, &interrupt),
+        Some(cli) => cli.command.run(&mut output, &config),
         None => print_version(&mut output),
     }
     .and_then(|outcome| {
         output.flush()?;
         Ok(outcome)
     });
-    if let Some(signal) = interrupt.signal() {
-        // The run ends by the signal whatever it returned. What stdout still
-        // holds is written first, and a failure to write it goes unreported.
-        let _ = output.flush();
-        return interrupt::terminate(signal);
-    }
     match result {
         Ok(CommandOutcome::Success) => ExitCode::SUCCESS,
-        Ok(CommandOutcome::Negative) => ExitCode::from(1),
         Err(CommandError::Stdout(error)) if error.is_closed_pipe() => ExitCode::SUCCESS,
         Err(error) => {
             output.error(&error);

@@ -15,12 +15,8 @@ pub struct PathError {
 }
 
 /// Adds path context to the result of a filesystem call.
-pub trait IoResultExt<T> {
+pub(crate) trait IoResultExt<T> {
     /// Wraps a failure in a [`PathError`] that names `path`.
-    ///
-    /// # Errors
-    ///
-    /// Returns the [`PathError`] when `self` is an error.
     fn with_path(self, path: &Path) -> Result<T, PathError>;
 }
 

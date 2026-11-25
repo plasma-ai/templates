@@ -10,16 +10,10 @@
         "description": "",
         "version": "",
         "authors": [
-            {
-                "name": "",
-                "email": ""
-            }
+            {"name": "", "email": ""}
         ],
         "maintainers": [
-            {
-                "name": "",
-                "email": ""
-            }
+            {"name": "", "email": ""}
         ],
         "codecov": {
             "token": ""

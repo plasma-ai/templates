@@ -24,7 +24,8 @@ jobs:
           cache-dependency-glob: "**/pyproject.toml"
       - name: Install Rust toolchain
         run: rustup toolchain install
-      - uses: taiki-e/install-action@v2
+      - name: Install cargo tools
+        uses: taiki-e/install-action@v2
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           tool: cargo-deny@0.22.1
@@ -56,11 +57,10 @@ jobs:
               '.codex-plugin/plugin.json': codex_version,
               '.cruft.json': cruft['project']['version'],
           }
-          # the surfaces hold one spelling, the one Cargo accepts
           if len(set(versions.values())) != 1:
               detail = ', '.join(f'{name}={v}' for name, v in versions.items())
               raise SystemExit(f'::error::versions differ: {detail}')
-          # the sdist is named with the spelling PyPI and the tag use
+          # a candidate is 2.0.0-rc.1 in these files and 2.0.0rc1 in the tag and the sdist name
           sdist = next(pathlib.Path('dist').glob('*.tar.gz'))
           version = sdist.name.removesuffix('.tar.gz').rsplit('-', 1)[1]
           if version != tag:
@@ -84,8 +84,6 @@ jobs:
             echo "$missing"
             exit 1
           fi
-      # NOTE: the sdist is installed by its file path, so the smoke test
-      #   cannot pick up a published release in place of the new build
       - name: Smoke-test installed sdist
         run: |
           uv venv smoke
@@ -139,15 +137,12 @@ jobs:
       - name: Check wheel holds only the binary
         run: |
           entries=$(unzip -Z1 dist/{{ cookiecutter.project.package | replace('-', '_') }}-*.whl | grep -v '\.dist-info/')
-          binary=$(echo "$entries" | grep -c '\.data/scripts/{{ cookiecutter.project.name }}$' || true)
-          if [[ "$binary" != 1 || "$entries" == *$'\n'* ]]; then
+          if [[ "$entries" != *.data/scripts/{{ cookiecutter.project.name }} || "$entries" == *$'\n'* ]]; then
             echo "::error::wheel should hold only the binary, found: $entries"
             exit 1
           fi
-      # NOTE: each wheel is installed by its file path, so the smoke test
-      #   cannot pick up a published release in place of the new build
       - name: Smoke-test installed wheel
-        if: {% raw %}${{ !contains(matrix.target, 'musl') }}{% endraw %}
+        if: matrix.manylinux != 'musllinux_1_2'
         run: |
           uv venv smoke
           uv pip install --python smoke/bin/python dist/*.whl
@@ -155,7 +150,7 @@ jobs:
           cd "$(mktemp -d)"
           "$GITHUB_WORKSPACE/smoke/bin/{{ cookiecutter.project.name }}" install --project
       - name: Smoke-test installed wheel on musl
-        if: {% raw %}${{ contains(matrix.target, 'musl') }}{% endraw %}
+        if: matrix.manylinux == 'musllinux_1_2'
         run: |
           docker run --rm --volume "$PWD/dist:/dist" python:{{ cookiecutter.default_python }}-alpine sh -ec '
             pip install /dist/*.whl
@@ -183,7 +178,6 @@ jobs:
         pattern: dist-*
         path: dist/
         merge-multiple: true
-    # a rerun after a partial upload skips the files already published
     - uses: pypa/gh-action-pypi-publish@release/v1
       with:
         skip-existing: true

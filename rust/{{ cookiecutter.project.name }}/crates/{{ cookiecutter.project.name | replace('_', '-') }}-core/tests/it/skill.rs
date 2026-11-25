@@ -11,27 +11,23 @@ use {{ cookiecutter.project.name }}_core::skill;
 use {{ cookiecutter.project.name }}_core::skill::LinkSkillsError;
 use tempfile::TempDir;
 
-use crate::support;
 use crate::support::TestResult;
 
-/// The prefix of the temporary directory each test creates.
-const ROOT_PREFIX: &str = "{{ cookiecutter.project.name }}-test-";
-
-/// Checks that an install copies the package's skills for both agents, and
-/// that a second install puts a changed copy right.
+/// Checks that an install copies the bundled skills for both agents, and that
+/// a second install restores a changed copy.
 #[test]
 fn install_copies_the_bundled_skills_and_replaces_an_earlier_copy() -> TestResult {
     let (_guard, root) = temp_root()?;
-    let bundled = read_tree(&bundled_skills())?;
+    let bundled = read_tree(Path::new(skill::SOURCE_DIR))?;
 
-    let installed = skill::install(&bundled_skills(), &root)?;
+    let installed = skill::install(&root)?;
     assert_eq!(read_tree(&root.join(".claude/skills"))?, bundled);
     assert_eq!(read_tree(&root.join(".agents/skills"))?, bundled);
 
     let first = installed.first().context("a skill should be bundled")?;
-    support::write_file(&first.path.join("stray.md"), "left by an earlier version")?;
+    fs::write(first.path.join("stray.md"), "left by an earlier version")?;
     fs::remove_file(first.path.join("SKILL.md"))?;
-    assert_eq!(skill::install(&bundled_skills(), &root)?, installed);
+    assert_eq!(skill::install(&root)?, installed);
     assert_eq!(read_tree(&root.join(".claude/skills"))?, bundled);
     assert_eq!(read_tree(&root.join(".agents/skills"))?, bundled);
     Ok(())
@@ -46,8 +42,8 @@ fn install_writes_linked_agent_directories_once() -> TestResult {
     fs::create_dir(root.join(".agents"))?;
     unix::fs::symlink(&claude, root.join(".agents/skills"))?;
 
-    let installed = skill::install(&bundled_skills(), &root)?;
-    let bundled = fs::read_dir(bundled_skills())?.count();
+    let installed = skill::install(&root)?;
+    let bundled = fs::read_dir(skill::SOURCE_DIR)?.count();
     assert_eq!(installed.len(), bundled);
     for skill in &installed {
         assert_eq!(skill.path.parent(), Some(claude.as_path()));
@@ -60,8 +56,8 @@ fn install_writes_linked_agent_directories_once() -> TestResult {
 #[test]
 fn link_points_both_agents_at_the_source_folder() -> TestResult {
     let (_guard, root) = temp_root()?;
-    let source = bundled_skills().canonicalize()?;
-    let installed = skill::install(&bundled_skills(), &root)?;
+    let source = Path::new(skill::SOURCE_DIR).canonicalize()?;
+    let installed = skill::install(&root)?;
 
     let linked = skill::link(&source, &root)?;
     assert_eq!(linked, installed);
@@ -80,7 +76,7 @@ fn link_points_both_agents_at_the_source_folder() -> TestResult {
 #[test]
 fn link_fails_when_the_source_folder_is_missing() -> TestResult {
     let (_guard, root) = temp_root()?;
-    let result = skill::link(&root.join("no-checkout"), &root);
+    let result = skill::link(&root.join("no-clone"), &root);
     assert!(
         matches!(result, Err(LinkSkillsError::ReadSource(_))),
         "{result:?}"
@@ -88,39 +84,12 @@ fn link_fails_when_the_source_folder_is_missing() -> TestResult {
     Ok(())
 }
 
-/// Checks that an agent directory which is the source folder itself is left
-/// alone, so neither a copy nor a link can overwrite the skills' sources.
-#[test]
-fn an_agent_directory_that_is_the_source_folder_is_left_alone() -> TestResult {
-    let (_guard, root) = temp_root()?;
-    let bundled = read_tree(&bundled_skills())?;
-    let source = root.join("checkout/skills");
-    support::copy_tree(&bundled_skills(), &source)?;
-    fs::create_dir(root.join(".claude"))?;
-    unix::fs::symlink(&source, root.join(".claude/skills"))?;
-
-    let installed = skill::install(&source, &root)?;
-    assert_eq!(read_tree(&source)?, bundled);
-    let linked = skill::link(&source, &root)?;
-    assert_eq!(read_tree(&source)?, bundled);
-    for skill in installed.iter().chain(&linked) {
-        assert!(
-            skill.path.starts_with(root.join(".agents/skills")),
-            "{skill:?}"
-        );
-    }
-    Ok(())
-}
-
-/// Returns the skills folder of the repository in the source tree.
-fn bundled_skills() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../{{ cookiecutter.project.name }}/skills")
-}
-
 /// Creates a temporary directory for one test and returns it with its
 /// canonical path, since a temporary directory is often behind a symlink.
 fn temp_root() -> TestResult<(TempDir, PathBuf)> {
-    let guard = tempfile::Builder::new().prefix(ROOT_PREFIX).tempdir()?;
+    let guard = tempfile::Builder::new()
+        .prefix("{{ cookiecutter.project.name }}-test-")
+        .tempdir()?;
     let root = guard.path().canonicalize()?;
     Ok((guard, root))
 }

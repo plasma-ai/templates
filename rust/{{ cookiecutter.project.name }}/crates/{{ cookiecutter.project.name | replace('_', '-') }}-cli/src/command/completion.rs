@@ -10,9 +10,6 @@ use crate::command::CommandOutcome;
 use crate::output::Output;
 
 /// Print a shell completion script
-///
-/// Writes the script for the given shell to stdout. The shell's own manual
-/// says where a completion script is installed.
 #[derive(Debug, Args)]
 pub(crate) struct CompletionArgs {
     /// Shell to write the script for

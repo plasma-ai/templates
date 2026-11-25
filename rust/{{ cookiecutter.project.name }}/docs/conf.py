@@ -7,17 +7,13 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Version source ----------------------------------------------------------
+# -- Path setup --------------------------------------------------------------
 
-# The docs are hand-written pages, so nothing is imported: the version is read
-# from the Cargo workspace manifest.
 import datetime as dt
 import pathlib
 import tomllib
 
 year = dt.date.today().year
-manifest = pathlib.Path(__file__).parent.parent / 'Cargo.toml'
-cargo = tomllib.loads(manifest.read_text(encoding='utf-8'))
 
 # -- Project information -----------------------------------------------------
 
@@ -26,6 +22,7 @@ author = 'Plasma AI'
 copyright = f'{year}: {author}'
 
 # The full version, including alpha/beta/rc tags
+cargo = tomllib.loads(pathlib.Path('../Cargo.toml').read_text(encoding='utf-8'))
 release = cargo['workspace']['package']['version']
 
 # -- Configure extensions ----------------------------------------------------

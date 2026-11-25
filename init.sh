@@ -185,11 +185,12 @@ echo "Created $NAME from the $TEMPLATE template"
 cd "$NAME"
 ln -s AGENTS.md CLAUDE.md
 
-# generate the Cargo lockfile so the initial commit carries it: it names the
-# workspace's own crates, so a template cannot ship one
-# --quiet: suppress cargo's locking chatter
+# generate the Cargo lockfile for the initial commit -- a template cannot
+# ship one, since it names the workspace's own crates, and a hook would
+# regenerate it on every cruft update and diff
+# -q: suppress cargo's locking chatter
 if [[ -f Cargo.toml ]]; then
-    cargo generate-lockfile --quiet
+    cargo generate-lockfile -q
 fi
 
 # initialize git on the context's default branch
