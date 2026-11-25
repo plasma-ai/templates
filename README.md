@@ -10,9 +10,10 @@ when the template changes, projects created from it can pull updates via
 
 ## Templates
 
-| Template          | Description                                                                                           |
-| :---------------- | :---------------------------------------------------------------------------------------------------- |
-| [python](python/) | Standalone Python package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions |
+| Template          | Description                                                                                                                  |
+| :---------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| [python](python/) | Standalone Python package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions                        |
+| [rust](rust/)     | Command-line tool in Rust, shipped as a binary wheel, with skill definitions, plugin manifests, docs, and Plasma conventions |
 
 `init.sh` creates a repository from a template:
 

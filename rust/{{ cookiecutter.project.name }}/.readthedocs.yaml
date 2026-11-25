@@ -1,0 +1,14 @@
+version: 2
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "{{ cookiecutter.default_python }}"
+  jobs:
+    post_create_environment:
+      - pip install uv
+    install:
+      # the docs are hand-written pages, so the binary is not built
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --no-install-project --group docs
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: true

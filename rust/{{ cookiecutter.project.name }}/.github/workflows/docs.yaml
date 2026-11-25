@@ -1,0 +1,34 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - {{ cookiecutter.branch }}
+  pull_request:
+    branches:
+      - {{ cookiecutter.branch }}
+
+env:
+  CARGO_BUILD_WARNINGS: deny
+
+jobs:
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+      - name: Install Rust toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: {% raw %}${{ github.ref == 'refs/heads/{% endraw %}{{ cookiecutter.branch }}{% raw %}' }}{% endraw %}
+      - name: Install docs dependencies
+        run: uv sync --no-install-project --group docs
+      - name: Build docs
+        run: uv run --no-sync sphinx-build -W docs docs/_build
+      - name: Build Rust docs
+        run: cargo doc --workspace --no-deps --document-private-items --locked
