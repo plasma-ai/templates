@@ -36,7 +36,7 @@ uv run pre-commit install
 
 # run tests
 uv run --no-sync pytest
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 # install the pinned Rust toolchain (reads rust-toolchain.toml)
 rustup toolchain install
@@ -58,7 +58,7 @@ uv run --no-sync safety scan
 ```
 
 The test suite uses `pytest` with `--doctest-modules` enabled.
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 The Cargo workspace under `crates/` is tested with `cargo-nextest`, and the
 pre-commit hooks run `cargo fmt` and `cargo clippy` on it.

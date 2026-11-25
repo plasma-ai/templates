@@ -1,4 +1,4 @@
 [toolchain]
-channel = "{{ cookiecutter.rust.toolchain }}"
+channel = "{{ cookiecutter.rust_toolchain }}"
 profile = "minimal"
 components = ["clippy", "rustfmt"]

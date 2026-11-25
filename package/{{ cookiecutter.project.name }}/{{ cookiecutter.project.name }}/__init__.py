@@ -2,7 +2,7 @@
 
 {{ cookiecutter.project.description }}
 """
-{%- if cookiecutter.rust.bindings != 'bin' %}
+{%- if cookiecutter.rust_bindings != 'bin' %}
 
 from . import cli, constants, core, exceptions, typing, util
 from .cli import *

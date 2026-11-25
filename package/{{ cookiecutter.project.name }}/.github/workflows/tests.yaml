@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - {{ cookiecutter.branch }}
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 env:
   CARGO_BUILD_WARNINGS: deny
@@ -23,7 +23,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
       - name: Install Rust toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
@@ -39,7 +39,7 @@ jobs:
         with:
           files: ./coverage.xml
           token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
   rust:
     name: rust
     runs-on: {% raw %}${{ matrix.os }}{% endraw %}

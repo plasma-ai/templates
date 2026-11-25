@@ -52,7 +52,7 @@ Codex):
 codex plugin marketplace add plasma-ai/plugins
 codex plugin add {{ cookiecutter.project.name }}@plasma
 ```
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 
 Another install route is from the CLI, which copies the skill into
 `~/.claude/skills` and `~/.agents/skills` (add `--project` for the current
@@ -113,7 +113,7 @@ Run `./install.sh --help` for all options. Alternatively, run
 
 Installing a dependency as editable (e.g. a sibling package) is left to the
 caller: `uv pip install --editable <path>`.
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 
 The CLI in the environment is the compiled Rust binary. After a change under
 `crates/`, re-run the install to rebuild it, or run the change directly with
@@ -127,7 +127,7 @@ edits apply without re-running the install.
 
 Once installed, run tools with `uv run --no-sync <command>`, or activate the
 environment first (`source .venv/bin/activate`).
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 The Cargo workspace needs [rustup](https://rustup.rs). Install the toolchain
 pinned in `rust-toolchain.toml`, and the cargo tools at the versions the
@@ -145,7 +145,7 @@ Run the test suite:
 ```bash
 pytest .
 ```
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 Run the Rust test suite:
 

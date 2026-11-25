@@ -5,7 +5,7 @@ use std::path::Path;
 
 use crate::support::TestResult;
 
-{% if cookiecutter.rust.bindings == 'bin' %}mod skill;
+{% if cookiecutter.rust_bindings == 'bin' %}mod skill;
 {% endif %}mod support;
 
 /// Checks that every file in `tests/it/` is declared as a module here.

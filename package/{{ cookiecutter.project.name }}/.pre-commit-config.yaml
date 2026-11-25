@@ -52,7 +52,7 @@ repos:
           - --wrap
           - "80"
           - --number
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
   - repo: local
     hooks:
       - id: cargo-fmt

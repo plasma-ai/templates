@@ -3,10 +3,8 @@
     "branch": "main",
     "python": "",
     "default_python": "",
-    "rust": {
-        "toolchain": "",
-        "bindings": ""
-    },
+    "rust_toolchain": "",
+    "rust_bindings": "",
     "project": {
         "name": "",
         "package": "",

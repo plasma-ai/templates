@@ -7,11 +7,11 @@ on:
   pull_request:
     branches:
       - {{ cookiecutter.branch }}
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
   schedule:
     - cron: "0 6 * * 1"
 {%- endif %}
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
 
 env:
   CARGO_BUILD_WARNINGS: deny
@@ -20,7 +20,7 @@ env:
 jobs:
   lint:
     name: lint
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
     if: github.event_name != 'schedule'
 {%- endif %}
     runs-on: ubuntu-latest
@@ -30,7 +30,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
       - name: Install Rust toolchain
         run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
@@ -53,7 +53,7 @@ jobs:
         run: uv run --no-sync cruft check
       - name: Reject forbidden file patterns
         run: test -z "$(find . -name "*.rej" -print -quit)" || exit 1
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
       - name: Check Rust supply chain
         run: |
           cargo deny --locked check bans licenses sources

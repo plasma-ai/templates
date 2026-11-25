@@ -141,7 +141,7 @@ fi
 
 # a context that pins a Rust toolchain scaffolds a Cargo workspace, whose
 # lockfile is generated after scaffolding
-RUST=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('rust', {}).get('toolchain', ''))" "$CONTEXT")
+RUST=$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('rust_toolchain', ''))" "$CONTEXT")
 if [[ -n "$RUST" ]] && ! command -v cargo &>/dev/null; then
     echo "Error: cargo is required (https://rustup.rs)" >&2
     exit 1

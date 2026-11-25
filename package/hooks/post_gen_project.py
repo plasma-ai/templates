@@ -6,8 +6,8 @@ import pathlib
 import shutil
 import subprocess
 
-RUST_TOOLCHAIN = '{{ cookiecutter.rust.toolchain }}'
-RUST_BINDINGS = '{{ cookiecutter.rust.bindings }}'
+RUST_TOOLCHAIN = '{{ cookiecutter.rust_toolchain }}'
+RUST_BINDINGS = '{{ cookiecutter.rust_bindings }}'
 PACKAGE = '{{ cookiecutter.project.name }}'
 CRATE = "{{ cookiecutter.project.name | replace('_', '-') }}"
 

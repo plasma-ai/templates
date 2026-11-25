@@ -47,7 +47,7 @@ Template for Plasma packages.
 └── README.md
 ```
 
-A context that sets `rust.toolchain` adds a Cargo workspace beside the Python
+A context that sets `rust_toolchain` adds a Cargo workspace beside the Python
 package:
 
 ```text
@@ -66,7 +66,7 @@ package:
 It also adds the Rust block to `.gitignore`, the cargo hooks to
 `.pre-commit-config.yaml`, and the Rust steps and jobs to the four workflows.
 
-A context that also sets `rust.bindings` to `bin` makes the command a Rust
+A context that also sets `rust_bindings` to `bin` makes the command a Rust
 binary, which maturin builds into the wheel. The Python CLI and the rest of the
 package skeleton give way to a launcher, and the workspace gains a CLI crate:
 
@@ -106,7 +106,8 @@ template changes before scaffolding.
        "branch": "main",
        "python": ">=3.11,<3.15",
        "default_python": "3.14",
-       "rust": {"toolchain": "", "bindings": ""},
+       "rust_toolchain": "",
+       "rust_bindings": "",
        "project": {
            "name": "project-name",
            "package": "package-name",
@@ -135,10 +136,10 @@ template changes before scaffolding.
    - `python` — Python version constraint for `requires-python` (required)
    - `default_python` — Python version for `.python-version`, CI, and Read the
      Docs (required)
-   - `rust.toolchain` — exact stable Rust release for `rust-toolchain.toml` and
+   - `rust_toolchain` — exact stable Rust release for `rust-toolchain.toml` and
      `rust-version`, e.g. `1.100.0` (optional, adds the Cargo workspace)
-   - `rust.bindings` — wheel shape, `bin` for a package whose command is a Rust
-     binary (optional, needs `rust.toolchain`)
+   - `rust_bindings` — wheel shape, `bin` for a package whose command is a Rust
+     binary (optional, needs `rust_toolchain`)
    - `project.name` — Python package name (directory and import name)
    - `project.package` — PyPI package name (for install commands and badges)
    - `project.title` — human-readable project title
@@ -165,7 +166,7 @@ template changes before scaffolding.
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 
-   With `rust.toolchain` set, `init.sh` also runs `cargo generate-lockfile`, so
+   With `rust_toolchain` set, `init.sh` also runs `cargo generate-lockfile`, so
    the initial commit carries `Cargo.lock`.
 
 ## Sphinx
@@ -194,9 +195,9 @@ Add the Cargo workspace to an existing project by setting the toolchain in its
 context, then generate and commit the lockfile:
 
 ```bash
-uv run --no-sync cruft update --variables-to-update '{"rust": {"toolchain": "<X.Y.Z>"}}'
+uv run --no-sync cruft update --variables-to-update '{"rust_toolchain": "<X.Y.Z>"}'
 cargo generate-lockfile
 ```
 
-Set `rust.bindings` when a project is created: on an existing project it removes
+Set `rust_bindings` when a project is created: on an existing project it removes
 the Python CLI the project has built.

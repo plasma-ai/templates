@@ -6,15 +6,15 @@ resolver = "3"
 version = "{{ cookiecutter.project.version }}"
 edition = "2024"
 publish = false
-rust-version = "{{ cookiecutter.rust.toolchain }}"
+rust-version = "{{ cookiecutter.rust_toolchain }}"
 
 [workspace.dependencies]
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 anstream = "1.0.0"
 anstyle = "1.0.14"
 {%- endif %}
 anyhow = "1.0.105"
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 clap = "4.6.10"
 clap_complete = "4.6.12"
 include_dir = "0.7.4"
@@ -76,7 +76,7 @@ unnested_or_patterns = "warn"
 unreadable_literal = "warn"
 wildcard_imports = "warn"
 
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 
 [profile.dev.package.insta]
 opt-level = 3        # snapshot assertions spend their time diffing

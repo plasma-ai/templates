@@ -3,7 +3,7 @@ allow-print-in-tests = true
 allow-unwrap-in-tests = true
 avoid-breaking-exported-api = false
 disallowed-methods = [
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
     { path = "std::env::var", reason = "read the environment once, in the configuration module" },
     { path = "std::env::var_os", reason = "read the environment once, in the configuration module" },
     { path = "std::io::stderr", reason = "write through the output type" },

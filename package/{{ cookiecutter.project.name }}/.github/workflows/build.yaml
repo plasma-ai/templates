@@ -19,7 +19,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
-      - name: Check tag matches package, plugin, {{ 'Cargo, ' if cookiecutter.rust.toolchain }}and cruft versions
+      - name: Check tag matches package, plugin, {{ 'Cargo, ' if cookiecutter.rust_toolchain }}and cruft versions
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           python3 - <<'PY'
@@ -31,24 +31,24 @@ jobs:
               line for line in init.splitlines() if line.startswith('__version__')
           )
           version = version_line.split('=', 1)[1].strip().strip('\'"')
-{%- if cookiecutter.rust.bindings != 'bin' %}
+{%- if cookiecutter.rust_bindings != 'bin' %}
           project_version = tomllib.load(open('pyproject.toml', 'rb'))['project']['version']
 {%- endif %}
           claude_version = json.load(open('.claude-plugin/plugin.json'))['version']
           codex_version = json.load(open('.codex-plugin/plugin.json'))['version']
           cruft = json.load(open('.cruft.json'))['context']['cookiecutter']
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
           cargo = tomllib.load(open('Cargo.toml', 'rb'))['workspace']['package']
 {%- endif %}
           versions = {
               '__version__': version,
-{%- if cookiecutter.rust.bindings != 'bin' %}
+{%- if cookiecutter.rust_bindings != 'bin' %}
               'pyproject.toml': project_version,
 {%- endif %}
               '.claude-plugin/plugin.json': claude_version,
               '.codex-plugin/plugin.json': codex_version,
               '.cruft.json': cruft['project']['version'],
-{%- if cookiecutter.rust.toolchain %}
+{%- if cookiecutter.rust_toolchain %}
               'Cargo.toml': cargo['version'],
 {%- endif %}
           }
@@ -58,7 +58,7 @@ jobs:
               raise SystemExit(f'::error::tag v{tag} != {detail}')
           print(f'All versions aligned at v{tag}')
           PY
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
       - name: Install Rust toolchain
         if: startsWith(github.ref, 'refs/tags/v')
         run: rustup toolchain install

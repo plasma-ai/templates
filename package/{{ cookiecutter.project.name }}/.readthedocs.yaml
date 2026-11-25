@@ -7,7 +7,7 @@ build:
     post_create_environment:
       - pip install uv
     install:
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
       # the docs import the package from the sources, so the binary is not built
       - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --no-install-project --all-extras --group docs
 {%- else %}

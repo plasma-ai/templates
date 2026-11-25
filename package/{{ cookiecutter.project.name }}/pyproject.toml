@@ -1,7 +1,7 @@
 {%- set github_owner = cookiecutter.github.org or cookiecutter.github.user -%}
 [project]
 name = "{{ cookiecutter.project.package }}"
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 dynamic = ["version"]
 {%- else %}
 version = "{{ cookiecutter.project.version }}"
@@ -17,7 +17,7 @@ maintainers = [
 {%- for maintainer in cookiecutter.project.maintainers %}
     { name = "{{ maintainer.name }}", email = "{{ maintainer.email }}" },
 {%- endfor %}{{ '\n' if cookiecutter.project.maintainers }}]
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 dependencies = []
 {%- else %}
 dependencies = [
@@ -34,10 +34,10 @@ Documentation = "https://{{ cookiecutter.urls.docs }}"
 {%- endif %}
 Changelog = "https://github.com/{{ github_owner }}/{{ cookiecutter.github.repo }}/blob/{{ cookiecutter.branch }}/CHANGELOG.md"
 
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 
 [tool.maturin]
-bindings = "{{ cookiecutter.rust.bindings }}"
+bindings = "{{ cookiecutter.rust_bindings }}"
 include = [{ path = "CHANGELOG.md", format = "sdist" }]
 manifest-path = "crates/{{ cookiecutter.project.name | replace('_', '-') }}-cli/Cargo.toml"
 module-name = "{{ cookiecutter.project.name }}"
@@ -80,7 +80,7 @@ type = [
 [tool.uv]
 required-version = ">=0.8"
 default-groups = []
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 # every file the native build reads, so an edit rebuilds the binary
 cache-keys = [
     { file = "pyproject.toml" },
@@ -233,7 +233,7 @@ ignore = [
 "docs/conf.py" = [
     "I002",
 ]
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 "{{ cookiecutter.project.name }}/**" = [
     "S606",
 ]
@@ -245,7 +245,7 @@ ignore = [
 "tests/**" = [
     "F811",
     "S101",
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
     "S404",
     "S603",
 {%- endif %}
@@ -279,7 +279,7 @@ parallel = true
 show_missing = true
 
 [build-system]
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 requires = ["maturin>=1.16,<2"]
 build-backend = "maturin"
 {%- else %}

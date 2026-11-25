@@ -1,5 +1,5 @@
 //! Domain library for `{{ cookiecutter.project.name }}`.
-{%- if cookiecutter.rust.bindings == 'bin' %}
+{%- if cookiecutter.rust_bindings == 'bin' %}
 
 mod path_error;
 pub mod skill;
