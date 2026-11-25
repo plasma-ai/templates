@@ -21,13 +21,13 @@ Usage: init.sh <name> --template <template> --context <path> --org <org> [option
 Initialize a repository from a Plasma template.
 
 Options:
-    --template <name>   Template folder in this repository (required)
-    --context <path>    Cookiecutter context JSON file (required)
-    --org <org>         GitHub organization (required)
-    --user <user>       Git user name (default: global git config)
-    --email <email>     Git user email (default: global git config)
-    --local             Skip pushing to the remote
-    --help|-h           Show this help message
+    --template <template>    Template folder in this repository (required)
+    --context <path>         Cookiecutter context JSON file (required)
+    --org <org>              GitHub organization (required)
+    --user <user>            Git user name (default: global git config)
+    --email <email>          Git user email (default: global git config)
+    --local                  Skip pushing to the remote
+    --help|-h                Show this help message
 USAGE
     exit "${1:-0}"
 }
@@ -124,10 +124,6 @@ if [[ -z "$TEMPLATE" ]]; then
     echo "Error: --template is required (a template folder in this repository)" >&2
     exit 1
 fi
-if [[ ! -f "$(dirname "$0")/$TEMPLATE/cookiecutter.json" ]]; then
-    echo "Error: unknown template: $TEMPLATE" >&2
-    exit 1
-fi
 if [[ -z "$CONTEXT" ]]; then
     echo "Error: --context is required (path to JSON context file)" >&2
     exit 1
@@ -138,6 +134,10 @@ if [[ -z "$ORG" ]]; then
 fi
 if [[ ! -f "$CONTEXT" ]]; then
     echo "Error: context file not found: $CONTEXT" >&2
+    exit 1
+fi
+if [[ ! -f "$(dirname "$0")/$TEMPLATE/cookiecutter.json" ]]; then
+    echo "Error: unknown template: $TEMPLATE" >&2
     exit 1
 fi
 if [[ -e "$NAME" ]]; then
