@@ -23,12 +23,8 @@ jobs:
         with:
           path: ~/.cache/pre-commit
           key: {% raw %}pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}{% endraw %}
-      - name: Install package with lint dependencies
-        run: ./install.sh --groups=lint
       - name: Run pre-commit
         run: uvx pre-commit run --all-files --show-diff-on-failure --color=always
-      # compare this project's template folder only, so a change to another
-      # template in the same repository does not fail the check
       - name: Check that project is up-to-date with template
         run: |
           template=$(jq -r .template .cruft.json)

@@ -116,7 +116,6 @@ template changes before scaffolding.
    - `name` is the repository name — the scaffold directory is renamed to it
      when it differs from `project.name` (e.g. an import package with
      underscores).
-   - `template` is this template's folder, `python`.
    - `context` is the path to the JSON context file.
    - `org` is the GitHub organization name.
 
