@@ -10,9 +10,9 @@ when the template changes, projects created from it can pull updates via
 
 ## Templates
 
-| Template            | Description                                                                                    |
-| :------------------ | :--------------------------------------------------------------------------------------------- |
-| [package](package/) | Standalone package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions |
+| Template          | Description                                                                                           |
+| :---------------- | :---------------------------------------------------------------------------------------------------- |
+| [python](python/) | Standalone Python package with CLI, skill definitions, plugin manifests, docs, and Plasma conventions |
 
 See the README in each template subdirectory for initialization instructions.
 
