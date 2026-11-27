@@ -38,13 +38,11 @@ jobs:
           maturin-version: v1.16.0
           command: sdist
           args: --out dist
-      - name: Check tag matches Cargo, package, plugin, cruft, and sdist versions
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Check Cargo, package, plugin, and cruft versions match
         run: |
           python3 - <<'PY'
-          import json, os, pathlib, tomllib
+          import json, tomllib
 
-          tag = os.environ['GITHUB_REF_NAME'].removeprefix('v')
           cargo = tomllib.load(open('Cargo.toml', 'rb'))['workspace']['package']
           project_version = tomllib.load(open('pyproject.toml', 'rb'))['project']['version']
           claude_version = json.load(open('.claude-plugin/plugin.json'))['version']
@@ -60,12 +58,21 @@ jobs:
           if len(set(versions.values())) != 1:
               detail = ', '.join(f'{name}={v}' for name, v in versions.items())
               raise SystemExit(f'::error::versions differ: {detail}')
-          # a candidate is 2.0.0-rc.1 in these files and 2.0.0rc1 in the tag and the sdist name
+          print(f'All versions aligned at {project_version}')
+          PY
+      - name: Check tag matches sdist version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          python3 - <<'PY'
+          import os, pathlib
+
+          tag = os.environ['GITHUB_REF_NAME'].removeprefix('v')
+          # a candidate is 2.0.0-rc.1 in the version files and 2.0.0rc1 in the tag and the sdist name
           sdist = next(pathlib.Path('dist').glob('*.tar.gz'))
           version = sdist.name.removesuffix('.tar.gz').rsplit('-', 1)[1]
           if version != tag:
               raise SystemExit(f'::error::tag v{tag} != sdist version {version}')
-          print(f'All versions aligned at v{tag}')
+          print(f'Tag v{tag} matches the sdist')
           PY
       - name: Check distribution metadata
         run: uvx twine check dist/*
