@@ -22,6 +22,28 @@ symlinks, includes and hooks from reaching outside a folder.
 A change to text both templates share goes to both folders in one commit;
 `check.sh`, a pre-commit hook, fails when that text differs.
 
+## Template Files
+
+Scaffolding is non-interactive: `init.sh` passes a reviewed JSON context file to
+`cruft create --no-input`, and cruft keeps the context in the project's
+`.cruft.json` for later updates.
+
+The context in each `cookiecutter.json` is nested objects that mirror config
+domains (`project`, `github`, `urls`), with empty-string defaults except
+`branch`. Keep a key that `cruft update --variables-to-update` sets on its own,
+such as `rust_toolchain`, at the top level: the command replaces each top-level
+value whole, so passing one nested key would reset the rest of its object to the
+defaults.
+
+In a rendered file:
+
+- Compute a derived value once, with a set-block at the top of the file.
+- Wrap a whole shell script in `{%- raw %}...{%- endraw %}`, and each GitHub
+  Actions `${{ }}` expression in `{% raw %}...{% endraw %}`. A raw guard is
+  mandatory wherever the file's own syntax collides with Jinja's delimiters.
+- Make optional metadata conditional, and render list-valued metadata with
+  for-loops that stay valid when the list is empty.
+
 ## Build & Development
 
 The repository is cookiecutter sources, so there is no build step. Run
